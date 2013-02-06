@@ -45,11 +45,11 @@ class factor:
         #in the case of a uniform prior
         if len(self.right) == 0:
             return 1.0/float(len(self.rv_values[self.left]))
-        """
-        ####
+       
+        ###
         # EARTH QUAKE EXAMPLE
         ###
-
+        """
         if self.left == "B" and len(self.right) == 0:
             if vals[self.left] == "t":
                 return .001
@@ -196,20 +196,20 @@ def main():
     cpd_lines= cpd.readlines()
     cpd.close()
 
-    num_random_variables = int(network_lines[0].rstrip("\n"))
+    num_random_variables = int(network_lines[0].rstrip("\n").rstrip("\r"))
     rv_vals = {}
     parents = collections.defaultdict(list)
 
 
     for i in range(1,num_random_variables + 1):
-        line = network_lines[i].rstrip("\n")
+        line = network_lines[i].rstrip("\n").rstrip("\r")
         rv,values = line.split(" ")
         values = values.split(",")
         
         rv_vals[rv] = values
 
     for i in range(num_random_variables + 1, len(network_lines)):
-        line = network_lines[i].rstrip("\n")
+        line = network_lines[i].rstrip("\n").rstrip("\r")
         
         parent,child = line.split(" -> ")
         parents[child].append(parent)
@@ -219,13 +219,14 @@ def main():
     cpds = {} #one hash table for all the cpds
 
     for line in cpd_lines:
-        line = line.rstrip("\n")
+        line = line.rstrip("\n").rstrip("\r")
         left,right,val = line.split(" ")
         right = right.split(",")
         val = float(val)
 
-        query= left + "|" + ",".join(right)
-        cpds[query] = val
+        for right_perm in itertools.permutations(right):
+            query= left + "|" + ",".join(right_perm)
+            cpds[query] = val
     
 
     #READ IN THE FACTORS
@@ -247,7 +248,6 @@ def main():
         right = sys.argv[4]
     query_var,observed_vars = parse_input(left,right)
 
-
     #calculate the unnormalized probability
     Z = filter(lambda x: x not in query_var.keys() and x not in observed_vars.keys(),rv_vals.keys())
     
@@ -263,6 +263,7 @@ def main():
 
     #calculate the normalization coeffiient
     sum = 0
+    
     cart_product = itertools.product(*[ rv_vals[var] for var in query_var.keys()])
     
     done = False
