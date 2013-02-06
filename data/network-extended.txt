@@ -6,4 +6,11 @@ CoworkerHasFlu Yes,No
 MaryIsVaccinated Yes,No
 IsFluSeason Yes,No
 PreviousFluRate Mild,Moderate,Severe
-
+IsFluSeason -> PreviousFluRate
+IsFluSeason -> FluRate
+PreviousFluRate -> FluRate
+FluRate -> CoworkerHasFlu
+FluRate -> RoommateHasFlu
+CoworkerHasFlu -> MaryHasFlu
+RoommateHasFlu -> MaryHasFlu
+MaryIsVaccinated -> MaryHasFlu
