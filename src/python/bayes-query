@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if which pypy > /dev/null ; then
+    pypy bayes-query.py $1 $2 $3 $4
+elif which pypy > /dev/null ; then
+    python bayes-query.py $1 $2 $3 $4
+else
+    echo "Python is not installed on this system"
+fi
