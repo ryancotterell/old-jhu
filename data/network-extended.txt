@@ -1,0 +1,9 @@
+7
+FluRate Mild,Moderate,Severe
+MaryGetsFlu Yes,No
+RoommateHasFlu Yes,No
+CoworkerHasFlu Yes,No
+MaryIsVaccinated Yes,No
+IsFluSeason Yes,No
+PreviousFluRate Mild,Moderate,Severe
+
