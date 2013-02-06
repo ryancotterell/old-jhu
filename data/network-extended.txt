@@ -11,6 +11,6 @@ IsFluSeason -> FluRate
 PreviousFluRate -> FluRate
 FluRate -> CoworkerHasFlu
 FluRate -> RoommateHasFlu
-CoworkerHasFlu -> MaryHasFlu
-RoommateHasFlu -> MaryHasFlu
-MaryIsVaccinated -> MaryHasFlu
+CoworkerHasFlu -> MaryGetsFlu
+RoommateHasFlu -> MaryGetsFlu
+MaryIsVaccinated -> MaryGetsFlu
