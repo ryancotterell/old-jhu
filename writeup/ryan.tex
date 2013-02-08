@@ -1,0 +1,63 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{enumerate}
+\newcommand{\mg} {
+\text{MG}_{\mathcal{G}}
+}
+\begin{document}
+\section{Network Queries}
+\subsection{Analytic Questions}
+Let’s consider the sensitivity of a particular query $P(X|Y)$ to the CPD of a particular node $Z$.
+Let $X$ and $Z$ be nodes (which are not directly connected) and Y be a set of nodes. We say that $Z$ has a requisite CPD for answering the query $P(X|Y)$ if there are two networks $\mathcal{B}_1$ and $\mathcal{B}_2$
+that have identical graph structure $\mathcal{G}$ and identical CPDs everywhere except at the node $Z$, and
+where $P_{\mathcal{B}_1}(X|Y) = P_{\mathcal{B}_2}(X|Y)$; in other words, the CPD of $Z$ aﬀects the answer to this query.
+This type of analysis is useful in various settings, including determining which CPDs we need
+to acquire for a certain query.
+Suppose we modify $\mathcal{G}$ into a graph $\mathcal{G}'$
+which is identical to $\mathcal{G}$ except contains a new ``dummy''
+node $\hat{Z}$ which is a parent of $Z$ (thereby altering the CPD of $Z$). One way to test whether $Z$ is
+a requisite probability node for $P(X|Y)$ is to test whether $\hat{Z}$ has an active trail to $X$ given $Y$
+in $\mathcal{G}'$ 	—if so, you can conclude that altering the CPD of $Z$ would aﬀect the result of $P(X|Y)$.
+\begin{enumerate}[1.]
+	\item Prove that the above strategy is a sound criterion for determining whether $Z$ is a requisite probability node for $P(X|\mathbf{Z})$ in $\mathcal{G}$, that is, for all pairs of networks $\mathcal{B}_1,\mathcal{B}_2$, as $P_{\mathcal{B}_1}(X|\mathbf{Y}) \not = P_{\mathcal{B}_2}(X|Y)$ 
+	\begin{proof}
+	
+	\end{proof}
+	\item 
+	Show that this criterion is weakly complete (like d-separation) in the sense that,
+if it fails to identify $Z$ as a requisite in $\mathcal{G}$, there exists some pair of networks $\mathcal{B}_1$, $\mathcal{B}_2$ as before, $P_{\mathcal{B}_1}(X|Y) \not = P_{\mathcal{B}_2}(X|Y)$.
+\begin{proof}
+Suppose the algorithm fails to identify $Z$ as requisite for the CPD. Thus there is not active trail from $X$ to $\hat{Z}$ in $\mathcal{G}'$ given $\mathbf{Y}$. By the definition of d-separation, there $X$ is conditionally independent of $\hat{Z}$ given $\mathbf{Y}$
+\end{proof}
+\end{enumerate}
+\section{Markov Blankets and D-Separation [20 Points]}
+Let $\text{MB}_{\mathcal{G}(X)}$ denote the Markov blanket of node $X$ in an \textbf{undirected} graph $\mathcal{G}$, whose set of nodes is denoted $\mathcal{X}$. The Markov blanket of $X$ is the set of $X$'s neighbors. 
+\begin{enumerate}[1.]	
+	\item 
+	\begin{enumerate}[(a)]
+		\item For any variable $X$, let $\mathbf{W} = \mathcal{X} - \{X\} - \text{MB}_{\mathcal{G}}(X)$. Then $X$ and $\mathbf{W}$ are d-separated given $\text{MB}_{\mathcal{G}}(X)$
+		\begin{proof}
+		Suppose $X$ and $\mathbf{W}$ where not d-separated given $\text{MG}_{\mathcal{G}}(X)$. Thus by the definition d-separation, there must be an active trail $T$  from a node $w\in \mathbf{W}$ to $X$. $X$ and $w$ are not adjacent since all all nodes adjacent to $X$ are in $\text{MG}_{\mathcal{G}}(X)$; by construction $w$ is not in $\text{MG}_{\mathcal{G}}(X)$. Therefore there must exist an element $m \in \text{MG}_{\mathcal{G}}(X)$ that is also in trail $T$. Since $m$ is observed, this contradicts the definition of an active trail.
+		\end{proof}
+	\item The set $\text{MG}_{\mathcal{G}}(X)$ is the minimal set for which this property holds. 
+		\begin{proof}
+		Suppose $\mg(X)$ is not the minimal set for which this property holds. This implies we can remove a node from $\mg(X)$ and the property will still hold. Let $y$ be an arbitrary node in $\mg(X)$. Therefore $y \in N_\mathcal{G}(X)$. By the definition of a neighborhood, there exists a vertex $v$ from $X$ to $y$.  Let $T = (X, v, y)$ be a trail. Since no node on $T$ is observed, $T$ is active. Additionally, since no node in $\mg(X)$ is on $T$, $T$ remains active if every element in $\mg(X)$ in observed. This contradicts the assertion that $\mg(X)$. 
+		\end{proof}
+	\end{enumerate}
+	\item 
+			Now suppose that $\mathcal{G}$ is directed. In a directed graph, the Markov blanket of $X$ is the following set of nodes: $X$'s parents, $X$'s children, and $X$'s children’s parents. We would like to prove the two statements in question 1 above in the directed case. It turns out that you can do this straightforwardly by utilizing the proofs you have already constructed for the undirected case. Please sketch a proof of these two statements for a directed graph $\mathcal{G}$ which relies on the proof for the undirected case. Your answer should be brief if your solution is complicated, you are probably on the wrong track.
+\begin{proof}
+Let $\mathcal{G}$ be an directed graph. For any variable $X$, let $W = \mathcal{X} - \{ X\} - \mg(X)$. 
+
+discussed in class. need to talk about I-equivalence, and immoralities...read text.
+\end{proof}
+
+\end{enumerate}
+\section{Comparing Network Types: Disease severity over time}
+In this section, we will consider modeling the severity of a disease over time using linear chain graphical models, which are commonly used to model discrete time series data.
+The random variable $Y_i$ denotes the disease severity (None, Mild, Severe) on day $i$. The random variable $S_{i,j}$ indicates a symptom $j$ on day $i$, such as the patient’s temperature or whether or not she has a cough (for example, if Mary had a case of the flu, we could model it day-by-day using such a model). The symptoms $\mathbf{S}$ are observed. The severity $\mathbf{Y}$ is not observed, but it can be inferred from the observed symptoms.
+Figure 3 shows three different types of networks to model this. The first is directed graph which encodes $P(\mathbf{Y}, \mathbf{S})$, called a hidden Markov model (HMM). The second is a directed graph which encodes $P(\mathbf{Y}|\mathbf{S})$ called a maximum-entropy Markov model (MEMM). The third is a type of conditional random field (CRF), which also models $P(\mathbf{Y}|\mathbf{S})$. CRFs can be partially directed or undirected; a partially directed version is shown here.
+The differences between these models are subtle, and even in practice it is not always clear which model to use. As you’ll learn later in the semester, the choice of model has implications and tradeoffs regarding learning and inference. In this assignment, we want you to think about the subtle differences in assumptions made by these models.
+
+\end{document}
