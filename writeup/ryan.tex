@@ -18,18 +18,19 @@ Suppose we modify $\mathcal{G}$ into a graph $\mathcal{G}'$
 which is identical to $\mathcal{G}$ except contains a new ``dummy''
 node $\hat{Z}$ which is a parent of $Z$ (thereby altering the CPD of $Z$). One way to test whether $Z$ is
 a requisite probability node for $P(X|Y)$ is to test whether $\hat{Z}$ has an active trail to $X$ given $Y$
-in $\mathcal{G}'$ 	—if so, you can conclude that altering the CPD of $Z$ would aﬀect the result of $P(X|Y)$.
+in $\mathcal{G}'$ 	—if so, you can conclude that altering the CPD of $Z$ would aﬀect the result of $P(X|Y)$.  \\ \\
+		Note. I am going to prove following as  discussed on Piazza. If $Z$ is found not to be requisite node, then again $P_{\mathcal{B}_1}(X|Y) = P_{\mathcal{B}_2}(X|Y)$, while if $Z$ is determined to be a requisite node, then there must exist at least one pair of networks such that $P_{\mathcal{B}_1}(X|Y) \not = P_{\mathcal{B}_2}(X|Y)$
 \begin{enumerate}[1.]
 	\item Prove that the above strategy is a sound criterion for determining whether $Z$ is a requisite probability node for $P(X|\mathbf{Z})$ in $\mathcal{G}$, that is, for all pairs of networks $\mathcal{B}_1,\mathcal{B}_2$, as $P_{\mathcal{B}_1}(X|\mathbf{Y}) \not = P_{\mathcal{B}_2}(X|Y)$ 
 	\begin{proof}
-	
+	Suppose $Z$ is found not to be a requisite node. Thus by the definition of the criterion above there must not exist an active trail from $\hat{Z}$ to $X$. Thus there cannot exist an active trail from $Z$ to $X$. We can prove this by  contradiction. Suppose there was such a trail $T$ from $Z$ to $X$, then since $\hat{Z}$ is a parent of $Z$, we can extend $T$ with the edge from $Z$ to $\hat{Z}$ thus creating an active trail from $X$ to $\hat{Z}$, contradiction the criterion. Thus by the definition of d-separation (as stated in the book), $X$ and $Z$ are conditionally independent. By the definition of conditionally independence $P_{\mathcal{B}_1}(X|Y) = P_{\mathcal{B}_2}(X|Y)$. So we conclude the criterion is valid.
 	\end{proof}
 	\item 
 	Show that this criterion is weakly complete (like d-separation) in the sense that,
 if it fails to identify $Z$ as a requisite in $\mathcal{G}$, there exists some pair of networks $\mathcal{B}_1$, $\mathcal{B}_2$ as before, $P_{\mathcal{B}_1}(X|Y) \not = P_{\mathcal{B}_2}(X|Y)$.
 \begin{proof}
-Suppose the algorithm fails to identify $Z$ as requisite for the CPD. Thus there is not active trail from $X$ to $\hat{Z}$ in $\mathcal{G}'$ given $\mathbf{Y}$. By the definition of d-separation, there $X$ is conditionally independent of $\hat{Z}$ given $\mathbf{Y}$
-\end{proof}
+	Suppose $Z$ is found to be a requisite node. Thus by the definition of the criterion above, there must exist an active trail from $\hat{Z}$ to $X$. Thus there must exist an active trail from $Z$ to $X$ by the same reasoning above. Thus $Z$ and $X$ are \textit{not} d-separated. Thus by Theorem 3.4 in the book, $X$ and $Z$ are dependent given $\mathbf{Y}$ in some distribution. Let $\mathcal{B}_1$ a network in which the previous claim is true and let $\mathcal{B}_2$ be a network in which it is not true. Thus for these two networks $P_{\mathcal{B}_1}(X|Y) \not = P_{\mathcal{B}_2}(X|Y)$.
+	\end{proof}
 \end{enumerate}
 \section{Markov Blankets and D-Separation [20 Points]}
 Let $\text{MB}_{\mathcal{G}(X)}$ denote the Markov blanket of node $X$ in an \textbf{undirected} graph $\mathcal{G}$, whose set of nodes is denoted $\mathcal{X}$. The Markov blanket of $X$ is the set of $X$'s neighbors. 
@@ -59,5 +60,37 @@ In this section, we will consider modeling the severity of a disease over time u
 The random variable $Y_i$ denotes the disease severity (None, Mild, Severe) on day $i$. The random variable $S_{i,j}$ indicates a symptom $j$ on day $i$, such as the patient’s temperature or whether or not she has a cough (for example, if Mary had a case of the flu, we could model it day-by-day using such a model). The symptoms $\mathbf{S}$ are observed. The severity $\mathbf{Y}$ is not observed, but it can be inferred from the observed symptoms.
 Figure 3 shows three different types of networks to model this. The first is directed graph which encodes $P(\mathbf{Y}, \mathbf{S})$, called a hidden Markov model (HMM). The second is a directed graph which encodes $P(\mathbf{Y}|\mathbf{S})$ called a maximum-entropy Markov model (MEMM). The third is a type of conditional random field (CRF), which also models $P(\mathbf{Y}|\mathbf{S})$. CRFs can be partially directed or undirected; a partially directed version is shown here.
 The differences between these models are subtle, and even in practice it is not always clear which model to use. As you’ll learn later in the semester, the choice of model has implications and tradeoffs regarding learning and inference. In this assignment, we want you to think about the subtle differences in assumptions made by these models.
+\subsection{Analytical Questions}
 
+\begin{enumerate}[1.]
+	\item 
+		\begin{enumerate}[(a.)]
+			\item HMM = Yes, MEMM = No, CRF = Yes
+			\item HMM = No, MEMM = Yes, CRF = Yes
+			\item HMM = No, MEMM = No, CRF = Yes
+		\end{enumerate}
+\end{enumerate}
+\section{Noisy-OR  other possible causes.}
+	\subsection{Analytical Questions}
+	One property of Bayesian networks is something called \textit{explaining away }which occurs when
+evidence that establishes a cause for an event reduces the likelihood of
+		\begin{enumerate}
+			\item	
+				\begin{enumerate}[(a)]
+					\item Show that this network must satisfy the explaining-away property $P()x^1|z^) \geq P(x^1|y^1,z^1)$
+					\begin{proof}
+					\begin{eqnarray*}
+						p(x^1|z^1,y^1) &=& \frac{p(x^1,y^1,z^1)}{p(z^1,y^1)} \\
+												&\leq & \frac{p(x^1,y^1,z^1) + p(x^1,y^0,z^1)}{p(z^1,y^1) + p(x^1,y^1,z^1)}\; \text{By the Mediant inequality} \\
+												&\leq & \frac{p(x^1,z^1)}{p(z^1,y^1) + p(x^1,y^0,z^1)} \\
+												&\leq & \frac{p(x^1,z^1)}{p(z^1,y^1) + p(x^1,y^0,z^1) + p(x^0,y^0,z^1)}\; \text{note that } p(x^0,y^0,z^1) = 0 \\
+												&\leq & \frac{p(x^1,z^1)}{p(z^1,y^1) + p(z^1,y^0)} \\
+												&\leq & \frac{p(x^1,z^1)}{p(z^1)} \\
+												&\leq & p(x^1|z^1)
+					\end{eqnarray*}
+					This shows that $p(x^1|z^1,y^1) \leq p(x^1|z^1)$. \\
+					Note that I continued to the $\leq$ on the right hand side to indicate that the right hand size is less than the original left hand size equation. All of the left hand side equations after the first are in fact equivalent. 
+					\end{proof}
+				\end{enumerate}
+		\end{enumerate}
 \end{document}
