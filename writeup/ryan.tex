@@ -183,12 +183,26 @@ Please see the {\tt network-F2.txt} and {\tt cpd-F2.txt} files for the encoding 
 
 \begin{enumerate}
 
-	\item
+	\item The general procedure to take a graph $\mathcal{G}$, remove a node, $X_i$, and create
+	an I-map, $\mathcal{G}'$ is the following. After $X_i$ is removed from the graph, you need
+	to maintain the influence the parents of $X_i$ have on the children of $X_i$. For example,
+	in the graph discussed in the problem, if we know nothing about \textbf{FluRate}, but we
+	do know that it is the \textbf{FluSeason} and/or know something about the 
+	\textbf{PreviousFluRate}, then that influences the probability of \textbf{MaryGetsFlu}.
+	
+	In order to maintain this relationship after $X_i$ has been removed, we need
+	to connect the parents of $X_i$ to all of the children $X_i$. If one of those connections
+	did not exist, we could infer from the graph that a parent and child of $X_i$ are independent,
+	which we could tell from $\mathcal{G}$ that that assumption is not true. Therefore, if
+	any of those connections are removed, it is creating an independence assertion that is not
+	present in $\mathcal{G}$, and thus is not an I-map. So in order to create an I-map for
+	$\mathcal{G}$, we need to connect all of the parents of the removed node, $X_i$ to all
+	of the children of $X_i$.
 
 \end{enumerate}
 
 \subsection{Network Queries}
-Let’s consider the sensitivity of a particular query $P(X|Y)$ to the CPD of a particular node $Z$.
+Let's consider the sensitivity of a particular query $P(X|Y)$ to the CPD of a particular node $Z$.
 Let $X$ and $Z$ be nodes (which are not directly connected) and Y be a set of nodes. We say that $Z$ has a requisite CPD for answering the query $P(X|Y)$ if there are two networks $\mathcal{B}_1$ and $\mathcal{B}_2$
 that have identical graph structure $\mathcal{G}$ and identical CPDs everywhere except at the node $Z$, and
 where $P_{\mathcal{B}_1}(X|Y) = P_{\mathcal{B}_2}(X|Y)$; in other words, the CPD of $Z$ affects the answer to this query.
@@ -198,7 +212,9 @@ Suppose we modify $\mathcal{G}$ into a graph $\mathcal{G}'$
 which is identical to $\mathcal{G}$ except contains a new ``dummy''
 node $\hat{Z}$ which is a parent of $Z$ (thereby altering the CPD of $Z$). One way to test whether $Z$ is
 a requisite probability node for $P(X|Y)$ is to test whether $\hat{Z}$ has an active trail to $X$ given $Y$
-in $\mathcal{G}'$ 	—if so, you can conclude that altering the CPD of $Z$ would aﬀect the result of $P(X|Y)$.  \\ \\
+in $\mathcal{G}'$ 	—if so, you can conclude that altering the CPD of $Z$ would aﬀect the result of $P(X|Y)$. 
+
+\subsubsection{Analytical Questions}
 		Note. I am going to prove following as  discussed on Piazza. If $Z$ is found not to be requisite node, then again $P_{\mathcal{B}_1}(X|Y) = P_{\mathcal{B}_2}(X|Y)$, while if $Z$ is determined to be a requisite node, then there must exist at least one pair of networks such that $P_{\mathcal{B}_1}(X|Y) \not = P_{\mathcal{B}_2}(X|Y)$
 \begin{enumerate}[1.]
 	\item Prove that the above strategy is a sound criterion for determining whether $Z$ is a requisite probability node for $P(X|\mathbf{Z})$ in $\mathcal{G}$, that is, for all pairs of networks $\mathcal{B}_1,\mathcal{B}_2$, as $P_{\mathcal{B}_1}(X|\mathbf{Y}) \not = P_{\mathcal{B}_2}(X|Y)$ 
@@ -212,7 +228,16 @@ if it fails to identify $Z$ as a requisite in $\mathcal{G}$, there exists some p
 	Suppose $Z$ is found to be a requisite node. Thus by the definition of the criterion above, there must exist an active trail from $\hat{Z}$ to $X$. Thus there must exist an active trail from $Z$ to $X$ by the same reasoning above. Thus $Z$ and $X$ are \textit{not} d-separated. Thus by Theorem 3.4 in the book, $X$ and $Z$ are dependent given $\mathbf{Y}$ in some distribution. Let $\mathcal{B}_1$ a network in which the previous claim is true and let $\mathcal{B}_2$ be a network in which it is not true. Thus for these two networks $P_{\mathcal{B}_1}(X|Y) \not = P_{\mathcal{B}_2}(X|Y)$.
 	\end{proof}
 \end{enumerate}
-\section{Markov Blankets and D-Separation [20 Points]}
+
+\subsubsection{Empirical Questions}
+
+\begin{enumerate}
+	\item 
+
+	\item 
+\end{enumerate}
+
+\subsection{Markov Blankets and D-Separation}
 Let $\text{MB}_{\mathcal{G}(X)}$ denote the Markov blanket of node $X$ in an \textbf{undirected} graph $\mathcal{G}$, whose set of nodes is denoted $\mathcal{X}$. The Markov blanket of $X$ is the set of $X$'s neighbors. 
 \begin{enumerate}[1.]	
 	\item 
@@ -235,23 +260,29 @@ discussed in class. need to talk about I-equivalence, and immoralities...read te
 \end{proof}
 
 \end{enumerate}
-\section{Comparing Network Types: Disease severity over time}
+\subsection{Comparing Network Types: Disease severity over time}
 In this section, we will consider modeling the severity of a disease over time using linear chain graphical models, which are commonly used to model discrete time series data.
 The random variable $Y_i$ denotes the disease severity (None, Mild, Severe) on day $i$. The random variable $S_{i,j}$ indicates a symptom $j$ on day $i$, such as the patient’s temperature or whether or not she has a cough (for example, if Mary had a case of the flu, we could model it day-by-day using such a model). The symptoms $\mathbf{S}$ are observed. The severity $\mathbf{Y}$ is not observed, but it can be inferred from the observed symptoms.
 Figure 3 shows three different types of networks to model this. The first is directed graph which encodes $P(\mathbf{Y}, \mathbf{S})$, called a hidden Markov model (HMM). The second is a directed graph which encodes $P(\mathbf{Y}|\mathbf{S})$ called a maximum-entropy Markov model (MEMM). The third is a type of conditional random field (CRF), which also models $P(\mathbf{Y}|\mathbf{S})$. CRFs can be partially directed or undirected; a partially directed version is shown here.
 The differences between these models are subtle, and even in practice it is not always clear which model to use. As you’ll learn later in the semester, the choice of model has implications and tradeoffs regarding learning and inference. In this assignment, we want you to think about the subtle differences in assumptions made by these models.
-\subsection{Analytical Questions}
+\subsubsection{Analytical Questions}
 
 \begin{enumerate}[1.]
 	\item 
-		\begin{enumerate}[(a.)]
+		\begin{enumerate}[(a)]
 			\item HMM = Yes, MEMM = No, CRF = Yes
 			\item HMM = No, MEMM = Yes, CRF = Yes
 			\item HMM = No, MEMM = No, CRF = Yes
 		\end{enumerate}
+		
+	\item \begin{enumerate}
+		\item
+			
+		\item 
+	\end{enumerate}
 \end{enumerate}
-\section{Noisy-OR  other possible causes.}
-	\subsection{Analytical Questions}
+\subsection{Noisy-OR  other possible causes.}
+	\subsubsection{Analytical Questions}
 	One property of Bayesian networks is something called \textit{explaining away }which occurs when
 evidence that establishes a cause for an event reduces the likelihood of
 		\begin{enumerate}
