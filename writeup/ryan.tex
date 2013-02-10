@@ -2,16 +2,196 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{enumerate}
+\usepackage{tikz}
+\usetikzlibrary{shapes}
 \newcommand{\mg} {
 \text{MG}_{\mathcal{G}}
 }
+
+\title{Machine Learning in Complex Domains: Assignment 1}
+\author{Ryan Cotterell, Dan Crankshaw, Dan Deutsch}
+
 \begin{document}
-\section{Network Queries}
-\subsection{Analytic Questions}
+
+\maketitle
+
+\setcounter{section}{1}
+\section{Problem Set}
+
+\setcounter{subsection}{1}
+\subsection{Designing an Extended Model}
+
+Please see the {\tt network-extended.txt} and {\tt cpd-extended.txt} files for the
+encoding of the model shown below.
+
+\begin{center}
+	\begin{tikzpicture}
+
+		\node (PreviousFluRate) at (0,8) [draw,shape=ellipse]{PreviousFluRate};		
+		\node (IsFluSeason) at (6,8) [draw,shape=ellipse]{IsFluSeason};		
+
+		\node (FluRate) at (3,6) [draw,shape=ellipse]{FluRate};		
+		
+		\node (CoworkerHasFlu) at (0,4) [draw,shape=ellipse]{CoworkerHasFlu};		
+		\node (RoommateHasFlu) at (6,4) [draw,shape=ellipse]{RoommateHasFlu};				
+		
+		\node (MaryHasFlu) at (3,2) [draw,shape=ellipse]{MaryHasFlu};				
+		
+		\node (MaryIsVaccinated) at (3,0) [draw,shape=ellipse]{MaryIsVaccinated};						
+		
+		\draw [->] (IsFluSeason) -- (PreviousFluRate);
+		\draw [->] (IsFluSeason) -- (FluRate);
+				
+		\draw [->] (PreviousFluRate) -- (FluRate);
+		
+		\draw [->] (FluRate) -- (CoworkerHasFlu);
+		\draw [->] (FluRate) -- (RoommateHasFlu);
+		
+		\draw [->] (CoworkerHasFlu) -- (MaryHasFlu);
+		
+		\draw [->] (RoommateHasFlu) -- (MaryHasFlu);
+		
+		\draw [->] (MaryIsVaccinated) -- (MaryHasFlu);
+	\end{tikzpicture}
+	\end{center}
+	
+	
+% PREVIOUS FLU RATE
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & \multicolumn{3}{|c|}{\textbf{PreviousFluRate}}  \\ 
+\hline 
+\textbf{IsFluSeason} & Mild & Moderate & Severe \\ 
+\hline 
+0 & 0.85 & 0.1 & 0.05 \\ 
+\hline 
+1 & 0.15 & 0.55 & 0.3 \\ 
+\hline 
+\end{tabular} 
+\end{center}
+
+% FLU RATE
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+\multicolumn{2}{|c|}{} & \multicolumn{3}{|c|}{\textbf{FluRate}} \\ 
+\hline 
+\textbf{PreviousFluRate} & \textbf{IsFluSeason} & Mild & Moderate & Severe \\ 
+\hline 
+Mild & 0 & 0.9 & 0.08 & 0.02 \\ 
+\hline 
+Mild & 1 & 0.3 & 0.5 & 0.2 \\ 
+\hline 
+Moderate & 0 & 0.85 & 0.1 & 0.05 \\ 
+\hline 
+Moderate & 1 & 0.1 & 0.65 & 0.25 \\ 
+\hline 
+Severe & 0 & 0.7 & 0.2 & 0.1 \\ 
+\hline 
+Severe & 1 & 0.05 & 0.1 & 0.75 \\ 
+\hline 
+\end{tabular} 
+\end{center}
+
+% COWORKER HAS FLU
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline 
+ & \multicolumn{2}{|c|}{\textbf{CoworkerHasFlu}} \\ 
+\hline 
+\textbf{FluRate} & 0 & 1 \\ 
+\hline 
+Mild & 0.8 & 0.2 \\ 
+\hline 
+Moderate & 0.5 & 0.5 \\ 
+\hline 
+Severe & 0.2 & 0.8 \\ 
+\hline 
+\end{tabular} 
+\end{center}
+
+% ROOMATE HAS FLU
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline 
+ & \multicolumn{2}{|c|}{\textbf{RoommateHasFlu}} \\ 
+\hline 
+\textbf{FluRate} & 0 & 1 \\ 
+\hline 
+Mild & 0.8 & 0.2 \\ 
+\hline 
+Moderate & 0.5 & 0.5 \\ 
+\hline 
+Severe & 0.2 & 0.8 \\ 
+\hline 
+\end{tabular}
+\end{center} 
+
+% MARY HAS FLU
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+\multicolumn{3}{|c|}{} & \multicolumn{2}{|c|}{\textbf{MaryHasFlu}}  \\ 
+\hline 
+\textbf{MaryIsVaccinated} & \textbf{RoomateHasFlu} & \textbf{CoworkerHasFlu} & 0 & 1 \\ 
+\hline 
+0 & 0 & 0 & 0.9 & 0.1 \\ 
+\hline 
+0 & 0 & 1 & 0.6 & 0.4 \\ 
+\hline 
+0 & 1 & 0 & 0.45 & 0.55 \\ 
+\hline 
+0 & 1 & 1 & 0.2 & 0.8 \\ 
+\hline 
+1 & 0 & 0 & 0.99 & 0.01 \\ 
+\hline 
+1 & 0 & 1 & 0.95 & 0.05 \\ 
+\hline 
+1 & 1 & 0 & 0.9 & 0.1 \\ 
+\hline 
+1 & 1 & 1 & 0.85 & 0.15 \\ 
+\hline 
+\end{tabular} 
+\end{center}
+
+\subsection{Network Manipulation}
+
+Please see the {\tt network-F2.txt} and {\tt cpd-F2.txt} files for the encoding of our network.
+
+\begin{center}
+\begin{tikzpicture}
+
+\node (MaryGetsFlu) at (2,0) [draw,shape=ellipse]{MaryGetsFlu};		
+\node (JohnGetsFlu) at (6,0) [draw,shape=ellipse]{JohnGetsFlu};		
+\node (MaryVaccinated) at (-.5,2) [draw,shape=ellipse]{MaryVaccinated};		
+\node (JohnVaccinated) at (8.5,2) [draw,shape=ellipse]{JohnVaccinated};		
+\node (IsFluSeason) at (1.5,4) [draw,shape=ellipse]{IsFluSeason};
+\node (PreviousFluRate) at (6.25,4) [draw,shape=ellipse]{PreviousFluRate};				
+
+\draw [->] (MaryVaccinated) -- (MaryGetsFlu);
+\draw [->] (JohnVaccinated) -- (JohnGetsFlu);
+
+\draw [->] (IsFluSeason) -- (MaryGetsFlu);
+\draw [->] (IsFluSeason) -- (JohnGetsFlu);
+
+\draw [->] (PreviousFluRate) -- (MaryGetsFlu);
+\draw [->] (PreviousFluRate) -- (JohnGetsFlu);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}
+
+	\item
+
+\end{enumerate}
+
+\subsection{Network Queries}
 Let’s consider the sensitivity of a particular query $P(X|Y)$ to the CPD of a particular node $Z$.
 Let $X$ and $Z$ be nodes (which are not directly connected) and Y be a set of nodes. We say that $Z$ has a requisite CPD for answering the query $P(X|Y)$ if there are two networks $\mathcal{B}_1$ and $\mathcal{B}_2$
 that have identical graph structure $\mathcal{G}$ and identical CPDs everywhere except at the node $Z$, and
-where $P_{\mathcal{B}_1}(X|Y) = P_{\mathcal{B}_2}(X|Y)$; in other words, the CPD of $Z$ aﬀects the answer to this query.
+where $P_{\mathcal{B}_1}(X|Y) = P_{\mathcal{B}_2}(X|Y)$; in other words, the CPD of $Z$ affects the answer to this query.
 This type of analysis is useful in various settings, including determining which CPDs we need
 to acquire for a certain query.
 Suppose we modify $\mathcal{G}$ into a graph $\mathcal{G}'$
