@@ -81,15 +81,15 @@ encoding of the model shown below.
 \hline 
 Mild & 0 & 0.9 & 0.08 & 0.02 \\ 
 \hline 
-Mild & 1 & 0.3 & 0.5 & 0.2 \\ 
+Mild & 1 & 0.2 & 0.5 & 0.3 \\ 
 \hline 
-Moderate & 0 & 0.85 & 0.1 & 0.05 \\ 
+Moderate & 0 & 0.4 & 0.55 & 0.05 \\ 
 \hline 
 Moderate & 1 & 0.1 & 0.65 & 0.25 \\ 
 \hline 
-Severe & 0 & 0.7 & 0.2 & 0.1 \\ 
+Severe & 0 & 0.2 & 0.3 & 0.5 \\ 
 \hline 
-Severe & 1 & 0.05 & 0.1 & 0.75 \\ 
+Severe & 1 & 0.1 & 0.3 & 0.6 \\ 
 \hline 
 \end{tabular} 
 \end{center}
@@ -154,6 +154,93 @@ Severe & 0.2 & 0.8 \\
 \hline 
 \end{tabular} 
 \end{center}
+
+\subsubsection{Model Properties}
+\begin{enumerate}
+	\item ``If Mary's roommate has the flu, Mary is more likely to catch the flu.''
+	
+	You can see in the CPTs above, whenever Mary's roommate has the flu, the probability
+	that Mary has the flu increases compared to when her roommate does not have the flu.
+	This also implies that Mary's roommate having the flu should be a parent of Mary getting
+	the flu.
+	
+	\item ``Similarly, if Mary's coworker has the flu, Mary is more likely to catch the flu.''
+	
+	Similarly, the same situation applies as before: when Mary's coworker has the flu, the
+	probability of Mary getting the flu increases. Again, this implies that Mary's coworker
+	having the flu should be a parent of Mary getting the flu.
+	
+	\item ``Since Mary comes in closer contact with her roommate than her coworker, the
+	probability of catching the flu increases more if her roommate has the flu than if
+	her coworker has the flu. If both have the flu, then Mary is even likelier to catch it.''
+	
+	If you look at the CPT for {\bf MaryHasFlu},
+	\begin{multline*}
+		P(Mary = 1 \,|\, Roommate = 1, Coworker = 1, Vaccinated = 0) > \\
+		P(Mary = 1 \,|\, Roommate= 1, Coworker = 0, Vaccinated = 0) > \\
+		P(Mary = 1 \,|\, Roommate = 0, Coworker = 1, Vaccinated = 0)
+	\end{multline*}
+	and
+	\begin{multline*}
+		P(Mary = 1 \,|\, Roommate = 1, Coworker = 1, Vaccinaed = 1) > \\
+		P(Mary = 1 \,|\, Roommate= 1, Coworker = 0, Vaccinated = 1) > \\
+		P(Mary = 1 \,|\, Roommate = 0, Coworker = 1, Vaccinated = 1)
+	\end{multline*}
+	
+	\item ``Mary's roomate and coworker are more likely to have the flu if the city's
+	flu rate is elevated.''
+	
+	This statement implies that the flu rate should be the parent of both Mary's coworker
+	getting the flu and Mary's roommate getting the flu. If you look at the CPTs for those
+	nodes, as the flu rate gets more severe, the probability that they get the flu increases.
+	
+	\item ``If we know the flu status of Mary's roommate and coworker, then knowing the
+	city's flu rate won't influence our belief about Mary catching the flu.''
+	
+	This implies that given Mary's roommate having the flu and Mary's coworker having
+	the flu, Mary having the flu is independent of the city's flu rate. Therefore, the
+	city's flu rate should not be connected to Mary has the flu, but should be the parents
+	of Mary's coworker and Mary's roommate.
+	
+	\item ``Both the current flu rate and the flu rate two weeks ago are most likely to
+	be mild if it is not currently the flu season. They are less likely to be moderate and 
+	very unlikely to be severe.''
+	
+	This implies that the flu season should be parents of the current flu rate and the
+	flu rate two weeks ago. If you look at the CPT for the flu rate, when it is not the flu season
+	the probability that the flu rate is mild is greater than moderate which is greater
+	than severe. Similarly the same is true for the previous flu rate.
+	
+	``If it is currently the flu season, then the flu rates are most likely to be moderate,
+	followed by severe.''
+	
+	In all cases, when it is the flu season, the flu rates are most likely to be moderate, then
+	severe, and finally mild.
+	
+	``The probability of being severe during the flu season is much higher than the same
+	probability during the off season.''
+	
+	In all cases, the probability of the flu rates being severe is much greater when it is the
+	flu season than when it isn't the flu season.
+	
+	\item ``The current flu rate in Mary's city is most likely to be the same level as the flu
+	rate two weeks ago, since the flu rate typically does not change too rapidly. The next
+	most likely level of the current rate depends on whether it is currently the flu season.''
+	
+	This condition contradicts some of the conditions imposed in the previous problem 
+	because the previous problem states that if it is flu season, it is most likely moderate,
+	severe, then mild. Then this problem says that they are more likely to be the same rate
+	as the previous flu rate, which could pose a problem for when the last one was mild or
+	severe. To make up for this, I tried to combine both and give slightly more probability
+	to the previous flu rate. For example, if the last one was severe, then I shifted some of the
+	mild and moderate probability to the severe column.
+
+	\item ``Mary is less likely to catch the flu if she has been vaccinated for it this year.''
+	
+	In all situations if Mary is vaccinated, the equivalent probability of her getting the flu
+	when she isn't vaccinated is larger than when she is vaccinated.
+
+\end{enumerate}
 
 \subsection{Network Manipulation}
 
