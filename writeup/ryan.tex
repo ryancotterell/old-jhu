@@ -198,7 +198,12 @@ Please see the {\tt network-F2.txt} and {\tt cpd-F2.txt} files for the encoding 
 	present in $\mathcal{G}$, and thus is not an I-map. So in order to create an I-map for
 	$\mathcal{G}$, we need to connect all of the parents of the removed node, $X_i$ to all
 	of the children of $X_i$.
-
+	
+	The probabilities for the new CPD can be attained as follows. Let $X$ be a node, $Y$ be the parent of that node we intend to remove and $Z_1,\ldots,Z_i$ be the parents of $Y$. We have the following CPDs $p(X|Y)$ and $p(Y|Z_1,\ldots,Z_i)$ By the chain rule, $p(X,Y|Z_1,\ldots,Z_i) = p(X|Y)p(Y|Z_1,\ldots,Z_i)$. Thus the new CPD for $X$ is
+	$$
+	P(X|Z_1,\ldots,Z_i) = \sum_{Y} p(X,Y|Z_1,\ldots,Z_i)
+	$$
+Thus we have attained a new minimal I-map, with a new CPD.
 \end{enumerate}
 
 \subsection{Network Queries}
@@ -219,7 +224,11 @@ in $\mathcal{G}'$ 	—if so, you can conclude that altering the CPD of $Z$ would
 \begin{enumerate}[1.]
 	\item Prove that the above strategy is a sound criterion for determining whether $Z$ is a requisite probability node for $P(X|\mathbf{Z})$ in $\mathcal{G}$, that is, for all pairs of networks $\mathcal{B}_1,\mathcal{B}_2$, as $P_{\mathcal{B}_1}(X|\mathbf{Y}) \not = P_{\mathcal{B}_2}(X|Y)$ 
 	\begin{proof}
-	Suppose $Z$ is found not to be a requisite node. Thus by the definition of the criterion above there must not exist an active trail from $\hat{Z}$ to $X$. Thus there cannot exist an active trail from $Z$ to $X$. We can prove this by  contradiction. Suppose there was such a trail $T$ from $Z$ to $X$, then since $\hat{Z}$ is a parent of $Z$, we can extend $T$ with the edge from $Z$ to $\hat{Z}$ thus creating an active trail from $X$ to $\hat{Z}$, contradiction the criterion. Thus by the definition of d-separation (as stated in the book), $X$ and $Z$ are conditionally independent. By the definition of conditionally independence $P_{\mathcal{B}_1}(X|Y) = P_{\mathcal{B}_2}(X|Y)$. So we conclude the criterion is valid.
+	Suppose $Z$ is found not to be a requisite node. Thus by the definition of the criterion above there must not exist an active trail from $\hat{Z}$ to $X$. Thus there cannot exist an active trail from $Z$ to $X$. 
+	
+	We can prove that there is no from from $Z$ to $X$  by  contradiction. Suppose there was such a trail $T$ from $Z$ to $X$, then since $\hat{Z}$ is a parent of $Z$, we can extend $T$ with the edge from $Z$ to $\hat{Z}$ thus creating an active trail from $X$ to $\hat{Z}$, contradiction the criterion. 
+	
+	Thus by the definition of d-separation (as stated in the book), $X$ and $Z$ are conditionally independent. By the definition of conditionally independence $P_{\mathcal{B}_1}(X|Y) = P_{\mathcal{B}_2}(X|Y)$. So we conclude the criterion is valid.
 	\end{proof}
 	\item 
 	Show that this criterion is weakly complete (like d-separation) in the sense that,
@@ -244,19 +253,18 @@ Let $\text{MB}_{\mathcal{G}(X)}$ denote the Markov blanket of node $X$ in an \te
 	\begin{enumerate}[(a)]
 		\item For any variable $X$, let $\mathbf{W} = \mathcal{X} - \{X\} - \text{MB}_{\mathcal{G}}(X)$. Then $X$ and $\mathbf{W}$ are d-separated given $\text{MB}_{\mathcal{G}}(X)$
 		\begin{proof}
-		Suppose $X$ and $\mathbf{W}$ where not d-separated given $\text{MG}_{\mathcal{G}}(X)$. Thus by the definition d-separation, there must be an active trail $T$  from a node $w\in \mathbf{W}$ to $X$. $X$ and $w$ are not adjacent since all all nodes adjacent to $X$ are in $\text{MG}_{\mathcal{G}}(X)$; by construction $w$ is not in $\text{MG}_{\mathcal{G}}(X)$. Therefore there must exist an element $m \in \text{MG}_{\mathcal{G}}(X)$ that is also in trail $T$. Since $m$ is observed, this contradicts the definition of an active trail.
+		Suppose by way of contradiction that $X$ and $\mathbf{W}$ were not d-separated given $\text{MG}_{\mathcal{G}}(X)$. Thus by the definition d-separation, there must be an active trail $T$  from a node $w\in \mathbf{W}$ to $X$. $X$ and $w$ are not adjacent since all all nodes adjacent to $X$ are in $\text{MG}_{\mathcal{G}}(X)$ since by construction $w$ is not in $\text{MG}_{\mathcal{G}}(X)$. So it follows that there must exist an element $m \in \text{MG}_{\mathcal{G}}(X)$ that is also in trail $T$ since the trail must begin with $X$ and advance to an adjacent node. Since $m$ is observed, this contradicts the definition of an active trail.
 		\end{proof}
 	\item The set $\text{MG}_{\mathcal{G}}(X)$ is the minimal set for which this property holds. 
 		\begin{proof}
-		Suppose $\mg(X)$ is not the minimal set for which this property holds. This implies we can remove a node from $\mg(X)$ and the property will still hold. Let $y$ be an arbitrary node in $\mg(X)$. Therefore $y \in N_\mathcal{G}(X)$. By the definition of a neighborhood, there exists a vertex $v$ from $X$ to $y$.  Let $T = (X, v, y)$ be a trail. Since no node on $T$ is observed, $T$ is active. Additionally, since no node in $\mg(X)$ is on $T$, $T$ remains active if every element in $\mg(X)$ in observed. This contradicts the assertion that $\mg(X)$. 
+		Suppose by way of contradiction that $\mg(X)$ is not the minimal set for which this property holds. This implies we can remove a node from $\mg(X)$ and the property will still hold. Let $y$ be an arbitrary node in $\mg(X)$. We then remove $y$ from $\mg(X)$. Since $y$ was in $\mg(X)$,  $y \in N_\mathcal{G}(X)$. By the definition of a neighborhood, there exists a vertex $v$ from $X$ to $y$.  Let $T = (X, v, y)$ be a trail. Since no node on $T$ is observed, $T$ is active. Additionally, since no node in $\mg(X)$ is on $T$, $T$ remains active if every element in $\mg(X)$ in observed. This contradicts the assertion 2.5.1a proved above since $y$ is therefor in $\mathbf{W}$ and thus $X$ and $\mathbf{W}$ are not d-separated given $\mg(X)$
 		\end{proof}
 	\end{enumerate}
 	\item 
 			Now suppose that $\mathcal{G}$ is directed. In a directed graph, the Markov blanket of $X$ is the following set of nodes: $X$'s parents, $X$'s children, and $X$'s children’s parents. We would like to prove the two statements in question 1 above in the directed case. It turns out that you can do this straightforwardly by utilizing the proofs you have already constructed for the undirected case. Please sketch a proof of these two statements for a directed graph $\mathcal{G}$ which relies on the proof for the undirected case. Your answer should be brief if your solution is complicated, you are probably on the wrong track.
 \begin{proof}
 Let $\mathcal{G}$ be an directed graph. For any variable $X$, let $W = \mathcal{X} - \{ X\} - \mg(X)$. 
-
-discussed in class. need to talk about I-equivalence, and immoralities...read text.
+Let $\mathcal{M}[\mathcal{G}]$ be the moral graph of a the Bayesian network $\mathcal{G}$ (Definition 4.16). That is by definition there is an an undirected edge between nodes $X$ and $Y$ in $\mathcal{G}$ if there is a directed edge between them or they are both parents of the same node. By the definition of a Markov Network, $\mathcal{M}[{\mathcal{G}}]$ is a Markov network and additionally $\mathcal{M}[\mathcal{G}]$ is a minimal I-map for $\mathcal{G}$. Now to prove the claim we simply need to show that the  all $X$'s neighbors in $\mathcal{M}[\mathcal{G}]$ corresponds to $X$'s parents, $X$'s children and $X$'s childrens parents. The the definition of the transform $\mathcal{M}$ undirected edges exist wherever a directed edge exists so $X$'s parents and $X$'s children are connected to $X$ by undirected edges. Additionally, there must be an undirected edge between $X$'s childrens parents since $X$ and a parent of one of $X$'s children are parents of a shared node, namely one of $X$'s children. Thus $X$'s parents, children and children's parents are all neighbors of $X$ in $\mathcal{M}[\mathcal{G}]$ so they are all in $\mg(X)$ in $\mathcal{M}[\mathcal{G}]$. Since $\mathcal{M}[\mathcal{G}]$ is a Markov Network, the proves from 2.5.1 hold and we have proved the claim.
 \end{proof}
 
 \end{enumerate}
@@ -271,14 +279,14 @@ The differences between these models are subtle, and even in practice it is not 
 	\item 
 		\begin{enumerate}[(a)]
 			\item HMM = Yes, MEMM = No, CRF = Yes
-			\item HMM = No, MEMM = Yes, CRF = Yes
-			\item HMM = No, MEMM = No, CRF = Yes
+			\item HMM = No, MEMM = Yes, CRF = No
+			\item HMM = No, MEMM = No, CRF = No
 		\end{enumerate}
-		
-	\item \begin{enumerate}
+		By the test in 2.4
+	\item \begin{enumerate}[(a)]
 		\item
-			
-		\item 
+				First of all, given that there are a lot of features, we have to take computational cost into account. In that regard, HMMs and MEMMs are much easier to learn, where as training a CRF can be computationally prohibitive. Second of all, we come to the age-old problem of generative models versus descriminative models. HMMs are generative whereas MEMM and CRFs are descriminative. Therefore the HMM will attempt to model $p(x,y) = p(y|x)p(x)$. In many cases modeling $p(x)$ is extremely hard as we have to explicitly model the features and the interactions between them. Given the amount of in domain knowledge we have, we may or may not want to go for a generative model. If we can model $p(x)$ reasonably well, it is  better to go with a generative model because it is often   possible to learn with less data. The discriminative models , MEMM and CRF, are both useful when, we can't explicitly model $p(x)$. The label bias problem makes  MEMM a poor choice.  MEMMs make an independence assumption (see 2.6.1.a) between time steps. This means that a later observations has no affect on previous observations. For this reason MEMM are generally avoided in favor of CRFs despite, the computational cost of training a CRF.	
+				\item I want to clarify that I am going to answer this question about feature correlation at a given time step. Feature correlation is not a problem for discriminative models in general because are a not modeling the features. This means that we don't really need to worry about feature correlation in the discrimination model. For the HMM, we need to accurately model the features and their independence assumptions. If we do this incorrectly, such as assuming independence, we could violate independence assumptions. 
 	\end{enumerate}
 \end{enumerate}
 \subsection{Noisy-OR  other possible causes.}
@@ -288,7 +296,7 @@ evidence that establishes a cause for an event reduces the likelihood of
 		\begin{enumerate}
 			\item	
 				\begin{enumerate}[(a)]
-					\item Show that this network must satisfy the explaining-away property $P()x^1|z^) \geq P(x^1|y^1,z^1)$
+					\item Show that this network must satisfy the explaining-away property $P(x^1|z^1) \geq P(x^1|y^1,z^1)$
 					\begin{proof}
 					\begin{eqnarray*}
 						p(x^1|z^1,y^1) &=& \frac{p(x^1,y^1,z^1)}{p(z^1,y^1)} \\
@@ -303,14 +311,20 @@ evidence that establishes a cause for an event reduces the likelihood of
 					Note that I continued to the $\leq$ on the right hand side to indicate that the right hand size is less than the original left hand size equation. All of the left hand side equations after the first are in fact equivalent. 
 					\end{proof}
 						\item 
-						MIGHT NOT BE RIGHT!!! JUST AN INTUITION \\
 							\begin{tabular}{c||c c c c}
 								$Z$ & $x^0,y^0$ & $x^0,y^1$ & $x^1,y^0$ & $x^1,y^1$  \\ \hline
-								$z^0$ & $1 - \lambda_X\lambda_Y$ & $\lambda_Y$ & $\lambda_X$ & $\lambda_X\lambda_Y$ \\
-								$z^1$ & $\lambda_X\lambda_Y$ & $1 - \lambda_Y$ & $1- \lambda_X$ & $1- \lambda_X\lambda_Y$
+								$z^0$ & .9 & .9 & .9 &  .1 \\
+								$z^1$ & .1  & .1 & .1 & .9
+							\end{tabular} \\
 							
-							\end{tabular}
-						\item If you know $X$, then $Z$ is independent of $Y$. This is true because you can completely determine $Y$ by changing $Z$. ??? Probability wrong
+						Additionally, we assume that no probability can be 0. Without this assumption the claim is not true since $p(y^1)$ could = 0, which would invalidate the inequality $p(x^1|z^1,y^1) > p(x^1|z^1)$. We can only prove the weaker claim of less than or equal to one. We also assumed a uniform prior since this would allow us to show this through our program.
+						\begin{verbatim}
+						./bayes-query network-Test.txt cpd-Test.txt X=1 Z=1,Y=1
+0.9
+						./bayes-query network-Test.txt cpd-Test.txt X=1 Z=1
+0.833333333333
+						\end{verbatim}
+						\item $p(x^1|y^0,z^0) = p(x^0|y^1,z^0)$, that is that $x$ is conditionally independent of $y$ given $z=0$. This makes sense because there is no longer an effect effect that two causes are competing to explain. 
 					\end{enumerate}
 				\item 
 					\begin{enumerate}[(a)]
