@@ -4,9 +4,7 @@
 \usepackage{enumerate}
 \usepackage{tikz}
 \usetikzlibrary{shapes}
-\newcommand{\mg} {
-\text{MG}_{\mathcal{G}}
-}
+\newcommand{\mg} {\text{MG}_{\mathcal{G}}}
 
 \title{Machine Learning in Complex Domains: Assignment 1}
 \author{Ryan Cotterell, Dan Crankshaw, Dan Deutsch}
@@ -328,9 +326,33 @@ if it fails to identify $Z$ as a requisite in $\mathcal{G}$, there exists some p
 \subsubsection{Empirical Questions}
 
 \begin{enumerate}
-	\item 
+	\item For the network in Figure 2, we let X=MaryGetsFlu, \textbf{Y} = MaryVaccinated, and
+    Z = PreviousFluRate. For the network we designed, X=MaryGetsFlu, \textbf{Y} = FluRate,
+    and Z=MaryIsVaccinated.\\
 
-	\item 
+    \texttt{\$~~bayes-query network-F.txt data/cpd-F.txt MaryGetsFlu=Yes MaryVaccinated=Yes,PreviousFluRate=NotElevated
+    0.05275}\\
+    \texttt{\$~~bayes-query data/network-F.txt data/cpd-F.txt MaryGetsFlu=Yes MaryVaccinated=Yes,PreviousFluRate=Elevated
+    0.143}\\\\
+
+    \texttt{\$~~bayes-query data/network-extended.txt data/cpd-extended.txt MaryGetsFlu=Yes FluRate=Severe,MaryIsVaccinated=Yes
+    0.1204}\\
+    \texttt{\$~~bayes-query data/network-extended.txt data/cpd-extended.txt MaryGetsFlu=Yes FluRate=Severe,MaryIsVaccinated=No
+    0.668}\\
+
+	\item For the network in Figure 2, X=MaryGetsFlu, \textbf{Y} = FluRate, Z=PreviousFluRate.
+    For the network we designed, X = MaryGetsFlu, \textbf{Y} = FluRate, Z = IsFluSeason.\\
+
+    \texttt{\$~~bayes-query data/network-F.txt data/cpd-F.txt MaryGetsFlu=Yes FluRate=Elevated,PreviousFluRate=Elevated 
+    0.35}\\
+    \texttt{\$~~bayes-query data/network-F.txt data/cpd-F.txt MaryGetsFlu=Yes FluRate=Elevated,PreviousFluRate=NotElevated
+    0.35}\\\\
+    \texttt{\$~~bayes-query data/network-extended.txt data/cpd-extended.txt MaryGetsFlu=Yes FluRate=Severe,IsFluSeason=Yes
+    0.3942}\\
+    \texttt{\$~~bayes-query data/network-extended.txt data/cpd-extended.txt MaryGetsFlu=Yes FluRate=Severe,IsFluSeason=No
+    0.3942}\\
+
+
 \end{enumerate}
 
 \subsection{Markov Blankets and D-Separation}
@@ -420,4 +442,36 @@ evidence that establishes a cause for an event reduces the likelihood of
 			
 					\end{enumerate}
 		\end{enumerate}
+        \subsubsection{}
+        \begin{enumerate}
+        \item
+        We can construct the new \emph{noisy or} CPD for $F_i$ using the node elimination
+        algorithm we created in section 2.3. We essentially just marginalize over the
+        $D_i$ that we are eliminating to create the new CPD\@. The original CPD for
+        node $F_i$ is:
+        \begin{equation*}
+            P(f_i^0 | \boldsymbol{Pa}_{F_i}) = (1 - \lambda_{i,0}) \prod_{D_J \in \boldsymbol{Pa_{F_i}}} (1 - \lambda_{i,j})^{d_j}
+        \end{equation*}
+
+        To create the new CPD we perform the following operation for each $D_m$
+        where $l < m < k$:
+        \begin{align*}
+                P(f_i^0 | \boldsymbol{Pa}_{F_i} - {D_m}) & =
+                P(f_i^0 | \boldsymbol{Pa}_{F_i} - {D_m}, D_m = 0) P(D_m = 0)\\
+                & + P(f_i^0 | \boldsymbol{Pa}_{F_i} - {D_m}, D_m = 1) P(D_m = 1)\\
+                & = (1 - \lambda_{i,0})(1-\lambda_{i,m}) P(D_m = 1) \prod_{D_J \in \boldsymbol{Pa_{F_i}} - {D_m}} (1 - \lambda_{i,j})^{d_j}\\
+                & + (1 - \lambda_{i,0}) P(D_m = 0) \prod_{D_J \in \boldsymbol{Pa_{F_i}} - {D_m}} (1 - \lambda_{i,j})^{d_j}
+        \end{align*}
+        This procedure will eliminate each of the unneeded parents without changing the joint
+        transformation over $D_i, \ldots, D_l, F_i$.
+        \item
+        This is an exact algorithm and will thus yield an exact transformation. We will
+        get the correct posterior probability relative to the original model with the
+        transformed model as well because in order to calculate the posterior probability
+        we would have to marginalize over the other $D_i$ anyway.
+        \end{enumerate}
+
+
+
+
 \end{document}
