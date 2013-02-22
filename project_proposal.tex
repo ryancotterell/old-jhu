@@ -1,0 +1,45 @@
+\documentclass[11pt]{article}
+
+% Packages augment basic latex. Here I use the geometry package to change the margins.
+\usepackage{geometry}  % give some flexibility to format
+\geometry{verbose,tmargin=1.00in,bmargin=1.00in,lmargin=1.0in,rmargin=1.0in} % needs the package geometry to work
+
+%For figures.
+\usepackage{graphicx}
+
+%This marks the start
+\begin{document}
+
+\title{Project Proposal}
+\author{Dan Crankshaw, Dan Deutsch, Ryan Cotterell}
+
+\maketitle
+
+The goal of our project is to create an infinite mixture model using a Direchlet process
+and Gibbs sampling to cluster Arabic social media data by dialect. This process will
+have several steps.
+\begin{itemize}
+\item
+We will begin with a literature review to understand the theoretical underpinnings
+of mixture models, infinite mixture models, Dirichlet processes, and Gibbs sampling.
+At the end of this we will create tutorial including sample code that will attempt
+to explain these concepts to someone with only an undergraduate computer science
+background.
+
+\item We will then implement an Infinite Mixture Model (IMM) that uses a Dirichlet process
+for the priors on the clusters and Gibbs sampling to perform inference. We will check
+the implementation against a known data set to verify its correctness.
+
+\item
+We will also implement a finite mixture model and derive a Gibbs sampler for this model as well.
+We will also test this implementation against a known data set.
+
+\item
+Finally, we will apply both the IMM and the FMM to a data set of short Arabic social media
+messages (SMS's, tweets, etc) to cluster these messages by dialect.
+\end{itemize}
+
+
+
+
+\end{document}
