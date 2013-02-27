@@ -1,0 +1,40 @@
+ W  W    WW           1             5   
+    W    WW 5           5          1    
+    W    WW                        3    
+    W    WWWWWWWWWWWWWWWWWWWW    4      
+WWWWWWWWWWWWWWW                  WWWWWWW
+3   W   3WW              4  2    43     
+  2 W    W        2         52  5 4     
+  3 W   5W   WWWWWW  WWWWWWWWWWWWWW    5
+WWWWWWWWWWWW5  2 4   1       5      WWWW
+    W    W   3 4 4            3        4
+ W  W 3 3W 1  5           1    53       
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW 3
+ W       W        1 WWWWWWWWWWWWWWW     
+         W          W     3         W  3
+    5    W    11   WW               W   
+         W        44W               W   
+  5      W  51 WWWWWWWWWWWWWWWWWWWWWW   
+ 41  1   W          W    5  1        5  
+            2       W      1            
+        W           W         1   4     
+     3  W1  WWWWWWWWWW                  
+WWWWW   W     53 5  W  WWWWWWWWWWWWWWWWW
+        W W      14 W         W    1    
+        W W         W        2W   4     
+        W W         W    2 43 W35   1   
+        W W     2   W      4  W         
+        WWWWWWWWWWWWW   W     W      4 2
+WWWWWWWWWWWWWWWWWWWWW3  W     W  3  WWWW
+        W W         WWWWWWWWWWWWWWW   11
+        W W   3 5  1W 25W 5   W  24     
+    W     W             W  1  W         
+ W 1W  5  W  4   1      W    3W 4       
+ W  W   1 W21           W     W         
+ W5 W     W 5                 W        1
+ W3 W     W             1 1   W         
+WWWWW  W  W4         1     1  W     1WWW
+WW  W     W    1 WWWWWWWWWWWWWWWWWWWWWWW
+3W  W    WW                  5          
+ W  W    WW  4 2            1           
+WWW W   1WW         4     WWWWWWWWWW WWW
