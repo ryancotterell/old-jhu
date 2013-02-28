@@ -6,11 +6,12 @@
 import sys;
 
 # This will figure out the dimensions of the grid
-def get_dimensions_and_landmarks(network_lines):
+def get_dimensions_and_landmarks_and_trajectories(network_lines):
     
     row = -1;
     col = -1;
     landmarks = -1;
+    trajectories = -1;
         
     for line in network_lines:
         if line.startswith("PositionRow_"):
@@ -29,7 +30,12 @@ def get_dimensions_and_landmarks(network_lines):
             observation,_,_ = line.split(" ")[0].split("_");
             landmarks = max(landmarks, observation[-1]);
    
-    return int(row), int(col), int(landmarks);
+    for line in network_lines:
+        if line.startswith("PositionRow_"):
+            _,time = line.split(" ")[0].split("_");
+            trajectories = max(trajectories, int(time));
+   
+    return int(row), int(col), int(landmarks), int(trajectories);
             
 
 # will read in the PositionRow_t+1 | PositionRow_t, Action and
@@ -107,7 +113,7 @@ def read_position_cpt(training_lines):
         previousRow = row;
         previousCol = col;
         previousAction = action;
-    
+        
     # need to now make them probabilities
     # normalize by the number of times we saw that action + 3 for Laplacian smoothing
     for action in actions:
@@ -169,10 +175,104 @@ def read_observation_cpt(training_lines, rows, columns, numLandmarks):
                 
                 for land in range(1, numLandmarks + 1):
                     land_cpt["ObserveLandmark" + str(land) + "_" + direction + "_t|PositionRow_t=" + str(row) + ",PositionCol_t=" + str(col)] = float(land_cpt["ObserveLandmark" + str(land) + "_" + direction + "_t|PositionRow_t=" + str(row) + ",PositionCol_t=" + str(col)]) / (float(2 + position_counter[str(row) + "," + str(col)]));
-    
-    print position_counter["1,1"];
-    
+        
     return wall_cpt, land_cpt;
+    
+
+def print_row_cpt(row_cpt, rows, trajectories, output_file):
+    
+    actions = ["MoveNorth", "MoveEast", "MoveSouth", "MoveWest"];
+
+    for time in range(1, trajectories + 1):
+        for row in range(1, rows + 1):
+            for action in actions:
+                
+                # i == i - 1
+                prob = row_cpt["PositionRow_t+1=i|PositionRow_t=i-1,Action_t=" + action];
+                otherPosition = row - 1;
+                
+                # do we need to wrap around?
+                if otherPosition == 0:
+                    otherPosition = rows;
+                
+                output_file.write("PositionRow_{0}={1} PositionRow_{2}={3},Action_{2}={4} {5}\n".format(time, row, time - 1, otherPosition, action, prob));
+                
+                #i == i
+                prob = row_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=" + action];
+                otherPosition = row;
+                
+                output_file.write("PositionRow_{0}={1} PositionRow_{2}={3},Action_{2}={4} {5}\n".format(time, row, time -1, otherPosition, action, prob));
+                
+                #i == i + 1
+                prob = row_cpt["PositionRow_t+1=i|PositionRow_t=i+1,Action_t=" + action];
+                otherPosition = row + 1;
+                
+                # do we need to wrap around?
+                if otherPosition == row + 1:
+                    otherPosition = 0;
+                
+                output_file.write("PositionRow_{0}={1} PositionRow_{2}={3},Action_{2}={4} {5}\n".format(time, row, time - 1, otherPosition, action, prob));
+
+def print_col_cpt(col_cpt, columns, trajectories, output_file):
+    
+    actions = ["MoveNorth", "MoveEast", "MoveSouth", "MoveWest"];
+
+    for time in range(1, trajectories + 1):
+        for col in range(1, columns + 1):
+            for action in actions:
+                
+                # j == j - 1
+                prob = col_cpt["PositionCol_t+1=j|PositionCol_t=j-1,Action_t=" + action];
+                otherPosition = col - 1;
+                
+                # do we need to wrap around?
+                if otherPosition == 0:
+                    otherPosition = columns;
+                
+                output_file.write("PositionCol_{0}={1} PositionCol_{2}={3},Action_{2}={4} {5}\n".format(time, col, time - 1, otherPosition, action, prob));
+                
+                #i == i
+                prob = col_cpt["PositionCol_t+1=j|PositionCol_t=j,Action_t=" + action];
+                otherPosition = col;
+                
+                output_file.write("PositionCol_{0}={1} PositionCol_{2}={3},Action_{2}={4} {5}\n".format(time, col, time - 1, otherPosition, action, prob));
+                
+                #i == i + 1
+                prob = col_cpt["PositionCol_t+1=j|PositionCol_t=j+1,Action_t=" + action];
+                otherPosition = col + 1;
+                
+                # do we need to wrap around?
+                if otherPosition == columns + 1:
+                    otherPosition = 0;
+                
+                output_file.write("PositionCol_{0}={1} PositionCol_{2}={3},Action_{2}={4} {5}\n".format(time, col, time - 1, otherPosition, action, prob));
+
+
+def print_observation_cpt(wall_cpt, land_cpt, rows, columns, landmarks, trajectories, output_file):
+
+    directions = ["N", "E", "S", "W"];
+    
+    for time in range(0, trajectories + 1):
+        for row in range(1, rows + 1):
+            for col in range(1, columns + 1):
+                for direction in directions:
+                    
+                    prob = wall_cpt["ObserveWall_{0}_t|PositionRow_t={1},PositionCol_t={2}".format(direction, row, col)];
+                    
+                    output_file.write("ObserveWall_{0}_{1}=Yes PositionRow_{1}={2},PositionCol_{1}={3} {4}\n".format(direction, time, row, col, prob));
+                    output_file.write("ObserveWall_{0}_{1}=No PositionRow_{1}={2},PositionCol_{1}={3} {4}\n".format(direction, time, row, col, 1 - prob));
+                    
+                    for land in range(1, landmarks + 1):
+                        prob = land_cpt["ObserveLandmark{0}_{1}_t|PositionRow_t={2},PositionCol_t={3}".format(land, direction, row, col)];
+                        
+                        output_file.write("ObserveLandmark{0}_{1}_{2}=Yes PositionRow_{2}={3},PositionCol_{2}={4} {5}\n".format(land, direction, time, row, col, prob));
+                        output_file.write("ObserveLandmark{0}_{1}_{2}=No PositionRow_{2}={3},PositionCol_{2}={4} {5}\n".format(land, direction, time, row, col, 1 - prob));
+
+def print_full_cpt(row_cpt, col_cpt, wall_cpt, land_cpt, rows, columns, landmarks, trajectories, output_file):
+
+    print_row_cpt(row_cpt, rows, trajectories, output_file);
+    print_col_cpt(col_cpt, columns, trajectories, output_file);
+    print_observation_cpt(wall_cpt, land_cpt, rows, columns, landmarks, trajectories, output_file);
     
 def main():
     
@@ -186,7 +286,7 @@ def main():
     num_variables = int(network_lines[0].rstrip("\n"));
     
     # get the dimensions of the grid
-    rows,columns,landmarks = get_dimensions_and_landmarks(network_lines);
+    rows,columns,landmarks,trajectories = get_dimensions_and_landmarks_and_trajectories(network_lines);
     
     # read in the possible values for each variable
     possible_values = {};
@@ -207,20 +307,12 @@ def main():
 
     wall_cpt, land_cpt = read_observation_cpt(training_lines, rows, columns, landmarks);
 
-#    print positionRowCPT;
-#    print positionColCPT;
-#    print wall_cpt;
-#    print land_cpt;
+    # I have confirmed with a regex that the number of times Action=MoveNorth 
+    # happens and we use it is 22,783. We add 3 for smoothing
 
-    print positionRow_cpt["PositionRow_t+1=i|PositionRow_t=i-1,Action_t=MoveNorth"];
-    print positionRow_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=MoveNorth"];
-    print positionRow_cpt["PositionRow_t+1=i|PositionRow_t=i+1,Action_t=MoveNorth"];
-
-    print wall_cpt["ObserveWall_N_t|PositionRow_t=1,PositionCol_t=1"];
-    
-    
-    
-    
+    output_file = open(sys.argv[3], "w+");
+    print_full_cpt(positionRow_cpt, positionCol_cpt, wall_cpt, land_cpt, rows, columns, landmarks, trajectories, output_file);
+    output_file.close();
     
 
 if __name__ == "__main__":
