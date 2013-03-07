@@ -32,12 +32,6 @@ class Clique:
     def __str__(self):
         return str(self.variables) + " - " + str(self.neighbors)
 
-
-def key_maker(var,val,vars,vals):
-    vs = sorted(zip(vars,vals),key=lambda x: x[0])
-    return var + "=" + val + "|" + ",".join([v[0] + "=" + v[1] for v in vs])
-
-
 #DATA STRUCTURE FOR A FACTOR
 class factor:
         #must be sorted in alphabetical order
@@ -182,7 +176,7 @@ def main():
         cliques[str(clique_to_id[second])].neighbors.append(clique_to_id[first])
         
 
-
+    print rv_to_vals
 
     #DATA
 
@@ -191,7 +185,7 @@ def main():
         scope_union = sorted(phi1.scope + [x for x in phi2.scope if x not in phi1.scope])
         psi = factor(scope_union)
         
-        for assignment in product(*map(lambda z: ['Yes','No'],scope_union)):
+        for assignment in product(*map(lambda z: rv_to_vals[z],scope_union)):
             zipped = dict(zip(scope_union,assignment))
         
             psi.add(assignment,phi1.p_hash(zipped)*phi2.p_hash(zipped))
@@ -204,7 +198,7 @@ def main():
         scope_union = sorted(phi1.scope + [x for x in phi2.scope if x not in phi1.scope])
         psi = factor(scope_union)
         
-        for assignment in product(*map(lambda z: ['Yes','No'],scope_union)):
+        for assignment in product(*map(lambda z: rv_to_vals[z],scope_union)):
             zipped = dict(zip(scope_union,assignment))
         
             if phi1.p_hash(zipped) == 0.0:
@@ -217,7 +211,7 @@ def main():
     def sum_out(phi1,var):
         cpd = {}
         
-        for assignment in product(*map(lambda z: ['Yes','No'],phi1.scope)):
+        for assignment in product(*map(lambda z: rv_to_vals[z],phi1.scope)):
             key = ",".join([ "%s=%s" % (x[0],x[1]) for x in zip(phi1.scope,assignment)])
             key_new = ",".join(["%s=%s" % (x[0],x[1]) for x in zip(phi1.scope,assignment) if x[0] != var])
             if key_new not in cpd:
@@ -232,6 +226,10 @@ def main():
 
 
     def all_in_clique(clique,factor):
+        """
+        Checks if the scope of the factor is a subset of the scope 
+        of the clique.
+        """
         for var in factor.scope:
             if var not in clique.variables:
                 return False
