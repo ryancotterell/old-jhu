@@ -198,9 +198,9 @@ def read_observation_cpt(training_lines, rows, columns, numLandmarks):
                 expression = observation + "_" + direction + "_t|PositionRow_t=" + row + ",PositionCol_t=" + col;
                 land_cpt[expression] = land_cpt[expression] + 1;
                 
-    print "(1,1) ObserveWall_N = " + str(wall_cpt["ObserveWall_N_t|PositionRow_t=1,PositionCol_t=1"]);
-    print "(1,1) ObserveLandmark1_N = " + str(land_cpt["ObserveLandmark1_N_t|PositionRow_t=1,PositionCol_t=1"]);
-    print "(1,1) PositionCounter = " + str(position_counter["1,1"]);
+#    print "(1,1) ObserveWall_N = " + str(wall_cpt["ObserveWall_N_t|PositionRow_t=1,PositionCol_t=1"]);
+#    print "(1,1) ObserveLandmark1_N = " + str(land_cpt["ObserveLandmark1_N_t|PositionRow_t=1,PositionCol_t=1"]);
+#    print "(1,1) PositionCounter = " + str(position_counter["1,1"]);
     
     # need to make them into probabilities
     for row in range(1, rows + 1):
