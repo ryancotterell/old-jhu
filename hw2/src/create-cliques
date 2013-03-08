@@ -1,0 +1,8 @@
+python create-clique.py 10 2 > ../output/cliquetree-grid10x10-t10.txt
+python create-clique.py 100 2 > ../output/cliquetree-grid10x10-t100.txt
+python create-clique.py 1000 2 > ../output/cliquetree-grid10x10-t1000.txt
+
+python create-clique.py 100 3 > ../output/cliquetree-grid15x15-t100.txt
+python create-clique.py 100 5 > ../output/cliquetree-grid25x25-t100.txt
+python create-clique.py 100 5 > ../output/cliquetree-grid30x30-t100.txt
+python create-clique.py 100 5 > ../output/cliquetree-grid40x40-t100.txt
