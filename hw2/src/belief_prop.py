@@ -4,11 +4,13 @@ import sys
 
 # we store CPD of a factor in a numpy ndarray
 class Factor:
-  def __init__(self, rvs):
-    self.rvs = rvs.sort()
-    print rvs
-    print self.rvs
-    self.cpt = self._init_cpt(rvs)
+  def __init__(self, rvs, dummy=False):
+    self.rvs = rvs
+    self.rvs.sort()
+    if not dummy:
+      self.cpt = self._init_cpt(rvs)
+    else:
+      self.cpt = None
     
   def _init_cpt(self, rvs):
     dims_list = []
@@ -39,7 +41,7 @@ class Factor:
     self.cpt[tuple(indices)] = value
 
   def __str__(self):
-    return (str(self.rvs) + "\n" + str(self.cpt) + 'num_parents: ' + str(len(self.parents)) + '\n')
+    return (str(self.rvs) + "\n" + str(self.cpt) + '\n')
   
   def __repr__(self):
     return str(self)
@@ -136,11 +138,14 @@ def parse_cpd(nodes, factors, cpd_file):
   cpd = open(cpd_file, 'r')
   for line in cpd:
     line = line.strip()
+    print line
     halves = line.split(' ')
+    print halves
     value = float(halves[2])
     variables = []
     variables.append(halves[0])
     variables = variables + halves[1].split(',')
+    print variables
     entry = {}
     for var in variables:
       sp = var.split('=')
@@ -154,7 +159,7 @@ def parse_cpd(nodes, factors, cpd_file):
 # their settings as values.
 # value is the value of the CPT with these settings
 def add_entry_to_factor(factors, entry, value):
-  factor_dummy = Factor(entry.keys())
+  factor_dummy = Factor(entry.keys(), True)
   # should find factor with matching random variables
   # because I overrode __eq__() in Factor
   fact_index = factors.index(factor_dummy)
@@ -181,11 +186,15 @@ def main(netfile, cpdfile):
   nodes = parse_network(netfile)
   factors = create_factors(nodes)
   parse_cpd(nodes, factors, cpdfile) 
-  update_cpds_for_single_node_factors(factors)
+  # update_cpds_for_single_node_factors(factors)
   for f in factors:
     print f
   # I now have all of my factors complete with cpds
   # time to put them into clique
+
+  # TODO I think the alphabetical ordering of my RVs within
+  # the factors isn't working. My lookup scheme for the factors
+  # (creating the dummy factors) also isn't working.
 
 
 
