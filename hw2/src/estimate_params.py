@@ -40,7 +40,7 @@ def get_dimensions_and_landmarks_and_trajectories(network_lines):
 
 # will read in the PositionRow_t+1 | PositionRow_t, Action and
 # PositionCol_t+1 | PositionCol_t, Action conditional probability tables.
-def read_position_cpt(training_lines):
+def read_position_cpt(training_lines, rows, columns):
     
     # initialize the CPT
     row_cpt = {};
@@ -85,10 +85,12 @@ def read_position_cpt(training_lines):
         positionChange = "";
         if (row == previousRow):
             positionChange = "i";
-        elif (int(row) + 1 == int(previousRow)):
+        elif (int(row) + 1 == int(previousRow) or (int(row) == int(rows) and int(previousRow) == 1)):
             positionChange = "i+1";
-        else:
+        elif (int(row) == int(previousRow) + 1 or (int(row) == 1 and int(previousRow) == int(rows))):
             positionChange = "i-1";
+        else:
+            print "row hit else case";
         
         # update the row_cpt
         expression = "PositionRow_t+1=i|PositionRow_t=" + positionChange + ",Action_t=" + previousAction;        
@@ -97,10 +99,12 @@ def read_position_cpt(training_lines):
         # figure out the column change
         if (col == previousCol):
             positionChange = "j";
-        elif (int(col) + 1 == int(previousCol)):
+        elif (int(col) + 1 == int(previousCol) or (int(col) == int(columns) and int(previousCol) == 1)):
             positionChange = "j+1";
-        else:
+        elif (int(col) == int(previousCol) + 1 or (int(col) == 1 and int(previousCol) == int(columns))):
             positionChange = "j-1";
+        else:
+            print "col hit else case";
 
         # update the col_cpt
         expression = "PositionCol_t+1=j|PositionCol_t=" + positionChange + ",Action_t=" + previousAction;
@@ -116,13 +120,39 @@ def read_position_cpt(training_lines):
         
     # need to now make them probabilities
     # normalize by the number of times we saw that action + 3 for Laplacian smoothing
-    for action in actions:
-        row_cpt["PositionRow_t+1=i|PositionRow_t=i-1,Action_t=" + action] = float(row_cpt["PositionRow_t+1=i|PositionRow_t=i-1,Action_t=" + action] / float(3 + moveCounters[action]));
-        row_cpt["PositionRow_t+1=i|PositionRow_t=i+1,Action_t=" + action] = float(row_cpt["PositionRow_t+1=i|PositionRow_t=i+1,Action_t=" + action] / float(3 + moveCounters[action]));
-        row_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=" + action] = float(row_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=" + action] / float(3 + moveCounters[action]));
-        col_cpt["PositionCol_t+1=j|PositionCol_t=j-1,Action_t=" + action] = float(col_cpt["PositionCol_t+1=j|PositionCol_t=j-1,Action_t=" + action] / float(3 + moveCounters[action]));
-        col_cpt["PositionCol_t+1=j|PositionCol_t=j+1,Action_t=" + action] = float(col_cpt["PositionCol_t+1=j|PositionCol_t=j+1,Action_t=" + action] / float(3 + moveCounters[action]));
-        col_cpt["PositionCol_t+1=j|PositionCol_t=j,Action_t=" + action] = float(col_cpt["PositionCol_t+1=j|PositionCol_t=j,Action_t=" + action] / float(3 + moveCounters[action]));
+    
+    # MoveNorth
+    action = "MoveNorth";
+    row_cpt["PositionRow_t+1=i|PositionRow_t=i-1,Action_t=" + action] = float(row_cpt["PositionRow_t+1=i|PositionRow_t=i-1,Action_t=" + action] / float(2 + moveCounters[action]));
+    row_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=" + action] = float(row_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=" + action] / float(2 + moveCounters[action]));
+    col_cpt["PositionCol_t+1=j|PositionCol_t=j,Action_t=" + action] = float(col_cpt["PositionCol_t+1=j|PositionCol_t=j,Action_t=" + action] / float(1 + moveCounters[action]));
+    
+    # MoveSouth
+    action = "MoveSouth";
+    row_cpt["PositionRow_t+1=i|PositionRow_t=i+1,Action_t=" + action] = float(row_cpt["PositionRow_t+1=i|PositionRow_t=i+1,Action_t=" + action] / float(2 + moveCounters[action]));
+    row_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=" + action] = float(row_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=" + action] / float(2 + moveCounters[action]));
+    col_cpt["PositionCol_t+1=j|PositionCol_t=j,Action_t=" + action] = float(col_cpt["PositionCol_t+1=j|PositionCol_t=j,Action_t=" + action] / float(1 + moveCounters[action]));
+
+    # MoveEast
+    action = "MoveEast";
+    row_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=" + action] = float(row_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=" + action] / float(1 + moveCounters[action]));
+    col_cpt["PositionCol_t+1=j|PositionCol_t=j-1,Action_t=" + action] = float(col_cpt["PositionCol_t+1=j|PositionCol_t=j-1,Action_t=" + action] / float(2 + moveCounters[action]));
+    col_cpt["PositionCol_t+1=j|PositionCol_t=j,Action_t=" + action] = float(col_cpt["PositionCol_t+1=j|PositionCol_t=j,Action_t=" + action] / float(2 + moveCounters[action]));
+
+    # MoveWest
+    action = "MoveWest";
+    row_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=" + action] = float(row_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=" + action] / float(1 + moveCounters[action]));
+    col_cpt["PositionCol_t+1=j|PositionCol_t=j+1,Action_t=" + action] = float(col_cpt["PositionCol_t+1=j|PositionCol_t=j+1,Action_t=" + action] / float(2 + moveCounters[action]));
+    col_cpt["PositionCol_t+1=j|PositionCol_t=j,Action_t=" + action] = float(col_cpt["PositionCol_t+1=j|PositionCol_t=j,Action_t=" + action] / float(2 + moveCounters[action]));
+
+    # this section was correct before the correction on piazza
+#    for action in actions:
+#        row_cpt["PositionRow_t+1=i|PositionRow_t=i-1,Action_t=" + action] = float(row_cpt["PositionRow_t+1=i|PositionRow_t=i-1,Action_t=" + action] / float(3 + moveCounters[action]));
+#        row_cpt["PositionRow_t+1=i|PositionRow_t=i+1,Action_t=" + action] = float(row_cpt["PositionRow_t+1=i|PositionRow_t=i+1,Action_t=" + action] / float(3 + moveCounters[action]));
+#        row_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=" + action] = float(row_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=" + action] / float(3 + moveCounters[action]));
+#        col_cpt["PositionCol_t+1=j|PositionCol_t=j-1,Action_t=" + action] = float(col_cpt["PositionCol_t+1=j|PositionCol_t=j-1,Action_t=" + action] / float(3 + moveCounters[action]));
+#        col_cpt["PositionCol_t+1=j|PositionCol_t=j+1,Action_t=" + action] = float(col_cpt["PositionCol_t+1=j|PositionCol_t=j+1,Action_t=" + action] / float(3 + moveCounters[action]));
+#        col_cpt["PositionCol_t+1=j|PositionCol_t=j,Action_t=" + action] = float(col_cpt["PositionCol_t+1=j|PositionCol_t=j,Action_t=" + action] / float(3 + moveCounters[action]));
     
     return row_cpt, col_cpt;
         
@@ -139,8 +169,11 @@ def read_observation_cpt(training_lines, rows, columns, numLandmarks):
     for direction in directions:
         for row in range(1, rows + 1):
             for col in range(1, columns + 1):
+                
+                # start at 2 to account for +1 smoothing with two values: Yes, No
                 position_counter[str(row) + "," + str(col)] = 0;
                 
+                # start at 1 to account for +1 smoothing with one value: Yes
                 wall_cpt["ObserveWall_" + direction + "_t|PositionRow_t=" + str(row) + ",PositionCol_t=" + str(col)] = 1;
                 
                 for land in range(1, numLandmarks + 1):
@@ -165,6 +198,9 @@ def read_observation_cpt(training_lines, rows, columns, numLandmarks):
                 expression = observation + "_" + direction + "_t|PositionRow_t=" + row + ",PositionCol_t=" + col;
                 land_cpt[expression] = land_cpt[expression] + 1;
                 
+    print "(1,1) ObserveWall_N = " + str(wall_cpt["ObserveWall_N_t|PositionRow_t=1,PositionCol_t=1"]);
+    print "(1,1) ObserveLandmark1_N = " + str(land_cpt["ObserveLandmark1_N_t|PositionRow_t=1,PositionCol_t=1"]);
+    print "(1,1) PositionCounter = " + str(position_counter["1,1"]);
     
     # need to make them into probabilities
     for row in range(1, rows + 1):
@@ -175,6 +211,7 @@ def read_observation_cpt(training_lines, rows, columns, numLandmarks):
                 
                 for land in range(1, numLandmarks + 1):
                     land_cpt["ObserveLandmark" + str(land) + "_" + direction + "_t|PositionRow_t=" + str(row) + ",PositionCol_t=" + str(col)] = float(land_cpt["ObserveLandmark" + str(land) + "_" + direction + "_t|PositionRow_t=" + str(row) + ",PositionCol_t=" + str(col)]) / (float(2 + position_counter[str(row) + "," + str(col)]));
+    
         
     return wall_cpt, land_cpt;
     
@@ -195,7 +232,8 @@ def print_row_cpt(row_cpt, rows, trajectories, output_file):
                 if otherPosition == 0:
                     otherPosition = rows;
                 
-                output_file.write("PositionRow_{0}={1} PositionRow_{2}={3},Action_{2}={4} {5}\n".format(time, row, time - 1, otherPosition, action, prob));
+                if (action == "MoveNorth"):
+                    output_file.write("PositionRow_{0}={1} PositionRow_{2}={3},Action_{2}={4} {5}\n".format(time, row, time - 1, otherPosition, action, prob));
                 
                 #i == i
                 prob = row_cpt["PositionRow_t+1=i|PositionRow_t=i,Action_t=" + action];
@@ -208,10 +246,11 @@ def print_row_cpt(row_cpt, rows, trajectories, output_file):
                 otherPosition = row + 1;
                 
                 # do we need to wrap around?
-                if otherPosition == row + 1:
-                    otherPosition = 0;
+                if otherPosition == rows + 1:
+                    otherPosition = 1;
                 
-                output_file.write("PositionRow_{0}={1} PositionRow_{2}={3},Action_{2}={4} {5}\n".format(time, row, time - 1, otherPosition, action, prob));
+                if (action == "MoveSouth"):
+                    output_file.write("PositionRow_{0}={1} PositionRow_{2}={3},Action_{2}={4} {5}\n".format(time, row, time - 1, otherPosition, action, prob));
 
 def print_col_cpt(col_cpt, columns, trajectories, output_file):
     
@@ -229,7 +268,8 @@ def print_col_cpt(col_cpt, columns, trajectories, output_file):
                 if otherPosition == 0:
                     otherPosition = columns;
                 
-                output_file.write("PositionCol_{0}={1} PositionCol_{2}={3},Action_{2}={4} {5}\n".format(time, col, time - 1, otherPosition, action, prob));
+                if (action == "MoveEast"):
+                    output_file.write("PositionCol_{0}={1} PositionCol_{2}={3},Action_{2}={4} {5}\n".format(time, col, time - 1, otherPosition, action, prob));
                 
                 #i == i
                 prob = col_cpt["PositionCol_t+1=j|PositionCol_t=j,Action_t=" + action];
@@ -243,9 +283,10 @@ def print_col_cpt(col_cpt, columns, trajectories, output_file):
                 
                 # do we need to wrap around?
                 if otherPosition == columns + 1:
-                    otherPosition = 0;
+                    otherPosition = 1;
                 
-                output_file.write("PositionCol_{0}={1} PositionCol_{2}={3},Action_{2}={4} {5}\n".format(time, col, time - 1, otherPosition, action, prob));
+                if (action == "MoveWest"):
+                    output_file.write("PositionCol_{0}={1} PositionCol_{2}={3},Action_{2}={4} {5}\n".format(time, col, time - 1, otherPosition, action, prob));
 
 
 def print_observation_cpt(wall_cpt, land_cpt, rows, columns, landmarks, trajectories, output_file):
@@ -303,7 +344,7 @@ def main():
     # open the training data
     training_lines = open(sys.argv[2]).readlines();
 
-    positionRow_cpt, positionCol_cpt = read_position_cpt(training_lines);
+    positionRow_cpt, positionCol_cpt = read_position_cpt(training_lines, rows, columns);
 
     wall_cpt, land_cpt = read_observation_cpt(training_lines, rows, columns, landmarks);
 
