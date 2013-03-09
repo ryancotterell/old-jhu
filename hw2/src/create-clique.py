@@ -76,12 +76,12 @@ def main():
 	for direction in directions:
 		
 		# Wall -> Parent
-		print "PositionRow_{0},PositionCol_{0},ObserveWall_{1}_{0} -- PositionRow_{0},PositionCol_{0},Action_{0}".format(steps - 2, direction);
+		print "PositionRow_{0},PositionCol_{0},ObserveWall_{1}_{0} -- PositionRow_{0},PositionCol_{0},Action_{0},PositionRow_{2}".format(steps - 2, direction, steps - 1);
 		print "PositionRow_{0},PositionCol_{0},ObserveWall_{1}_{0} -- PositionRow_{0},PositionCol_{0},Action_{0}".format(steps - 1, direction);
 
 		# Land -> Parent
 		for landmark in range(1, landmarks + 1):
-			print "PositionRow_{0},PositionCol_{0},ObserveLandmark{1}_{2}_{0} -- PositionRow_{0},PositionCol_{0},Action_{0}".format(steps - 2, landmark, direction);
+			print "PositionRow_{0},PositionCol_{0},ObserveLandmark{1}_{2}_{0} -- PositionRow_{0},PositionCol_{0},Action_{0},PositionRow_{3}".format(steps - 2, landmark, direction, steps - 1);
 			print "PositionRow_{0},PositionCol_{0},ObserveLandmark{1}_{2}_{0} -- PositionRow_{0},PositionCol_{0},Action_{0}".format(steps - 1, landmark, direction);
 
 	# Row_t, Col_t, Action_t -> Col_t-1, Action_t-1, Row_t, Col_t
