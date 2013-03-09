@@ -1,16 +1,14 @@
 import numpy as np
 import sys
+import functools
 
 
 # we store CPD of a factor in a numpy ndarray
 class Factor:
-  def __init__(self, rvs, dummy=False):
+  def __init__(self, rvs):
     self.rvs = rvs
     self.rvs.sort()
-    if not dummy:
-      self.cpt = self._init_cpt(rvs)
-    else:
-      self.cpt = None
+    self.cpt = self._init_cpt(rvs)
     
   def _init_cpt(self, rvs):
     dims_list = []
@@ -28,14 +26,16 @@ class Factor:
   def __hash__(self):
     return hash(frozenset(self.rvs))
 
-  def update_cpt_entry(entry, value):
+  def update_cpt_entry(self, entry, value):
     if (len(entry) != len(self.rvs)):
       raise Exception('length mismatch') 
     # order of indices is lexicographical order of RV names in factor
     indices = []
-    for rv_name, rv in zip(sorted(entry), self.rvs):
+    for rv_name, rv in zip(sorted(entry), sorted(self.rvs)):
       if rv_name != rv.name:
-        raise Exception('mismatch in rvs grep thishkjashdkjh')
+        print entry
+        print self.rvs
+        raise Exception((rv_name + ' ' +  rv.name))
       # find the index that corresponds to this setting of the RV
       indices.append(rv.get_index(entry[rv_name]))
     self.cpt[tuple(indices)] = value
@@ -65,6 +65,7 @@ class SepSet:
     else:
         return False
 
+@functools.total_ordering
 class Node:
   def __init__(self, nm, vals):
     self.values = vals
@@ -87,7 +88,13 @@ class Node:
     return ('name: ' + self.name + ' values: ' + str(self.values) + ' parents: ' + str(self.parents) + '\n')
   def __repr__(self):
     return str(self)
-    
+  
+  def __eq__(self, other):
+    if not isinstance(other, Node):
+      return False
+    return self.name == other.name
+  def __lt__(self, other):
+    return self.name < other.name
 
 def multiply_factors(phi1, phi2):
   return 0
@@ -121,13 +128,15 @@ def parse_network(netfile):
 def create_factors(nodes):
   # now create factors
   # TODO(crankshaw) might be good to add factors to cliques here as well
-  factors = []
+  factors = {}
   for name in nodes:
     nodes_in_factor = [nodes[n] for n in nodes[name].parents]
+    node_names = list(nodes[name].parents)
+    node_names.append(name)
     # nodes_in_factor = list(nodes[name].parents)
     nodes_in_factor.append(nodes[name])
     # print nodes_in_factor
-    factors.append(Factor(nodes_in_factor))
+    factors[frozenset(node_names)]= Factor(nodes_in_factor)
   return factors
 
   # maybe name factor based on a hash of all nodes in the factor
@@ -138,14 +147,14 @@ def parse_cpd(nodes, factors, cpd_file):
   cpd = open(cpd_file, 'r')
   for line in cpd:
     line = line.strip()
-    print line
+    # print line
     halves = line.split(' ')
-    print halves
+    # print halves
     value = float(halves[2])
     variables = []
     variables.append(halves[0])
     variables = variables + halves[1].split(',')
-    print variables
+    # print variables
     entry = {}
     for var in variables:
       sp = var.split('=')
@@ -159,11 +168,12 @@ def parse_cpd(nodes, factors, cpd_file):
 # their settings as values.
 # value is the value of the CPT with these settings
 def add_entry_to_factor(factors, entry, value):
-  factor_dummy = Factor(entry.keys(), True)
-  # should find factor with matching random variables
-  # because I overrode __eq__() in Factor
-  fact_index = factors.index(factor_dummy)
-  factor = factors[factor_index]
+  # key is an immutable set of the names of all RVs in the factor
+  # keyset = set()
+  # for name in entry:
+  #     keyset.add(name)
+  key = frozenset(iter(entry))
+  factor = factors[key]
   factor.update_cpt_entry(entry, value)
   
   
@@ -188,7 +198,7 @@ def main(netfile, cpdfile):
   parse_cpd(nodes, factors, cpdfile) 
   # update_cpds_for_single_node_factors(factors)
   for f in factors:
-    print f
+    print factors[f]
   # I now have all of my factors complete with cpds
   # time to put them into clique
 
