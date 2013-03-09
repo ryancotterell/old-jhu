@@ -50,8 +50,12 @@ class Factor:
     
 
 class Clique:
-  def __init__(self):
-    print 'constructed Clique'
+  def __init__(self, factors, nodes):
+    self.factors = factors
+    self.nodes = nodes
+    self.neighbors = []
+  def add_neighbor(self, neighbor)
+    self.neighbors.append(neighbor)
 
 class SepSet:
   def __init__(self, c1, c2):
@@ -189,6 +193,34 @@ def update_cpds_for_single_node_factors(factors):
         raise Exception('factor has one node that has parents')
       # fill in CPT with uniform distribution
       factor.cpt = np.ones(len(node.values))/np.float64(len(node.values))
+
+def create_cliques(clique_file, factors):
+  with open(clique_file, 'r') as read_cliques:
+    cliques = {}
+    num_cliques = int(read_cliques.readline())
+    for i in range(num_cliques):
+      line = read_cliques.readline().strip()
+      comps = line.split(',')
+      current_clique = frozenset(comps)
+      factors_in_clique = {}
+      for i, f in factors.iteritems():
+        # check if factor is a subset of this clique
+        if i <= current_clique:
+          factors_in_clique[i] = f
+      cliques[current_clique] = Clique(factors_in_clique, current_clique)
+    sepsets = []
+    for line in read_cliques:
+      parts = line.strip().split(' ')
+      if len(parts) != 3:
+        raise Exception('malformed clique tree file')
+      first_clique_set = frozenset(parts[0].split(','))
+      second_clique_set = frozenset(parts[2].split(','))
+      first_clique = cliques[first_clique_set]
+      second_clique = cliques[second_clique_set]
+      sepsets.append(SepSet(first_clique, second_clique))
+      first_clique.add_neighbor(second_clique)
+      second_clique.add_neighbor(first_clique)
+  return (cliques, sepsets)
       
     
 
@@ -196,7 +228,7 @@ def main(netfile, cpdfile):
   nodes = parse_network(netfile)
   factors = create_factors(nodes)
   parse_cpd(nodes, factors, cpdfile) 
-  # update_cpds_for_single_node_factors(factors)
+  update_cpds_for_single_node_factors(factors)
   for f in factors:
     print factors[f]
   # I now have all of my factors complete with cpds
