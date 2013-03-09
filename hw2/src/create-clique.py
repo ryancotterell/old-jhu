@@ -54,7 +54,7 @@ def main():
 
 
 	# now print the connections
-	for time in range(0, steps - 1):
+	for time in range(0, steps - 2):
 
 		for direction in directions:
 
@@ -76,12 +76,14 @@ def main():
 	for direction in directions:
 		
 		# Wall -> Parent
+		print "PositionRow_{0},PositionCol_{0},ObserveWall_{1}_{0} -- PositionRow_{0},PositionCol_{0},Action_{0}".format(steps - 2, direction);
 		print "PositionRow_{0},PositionCol_{0},ObserveWall_{1}_{0} -- PositionRow_{0},PositionCol_{0},Action_{0}".format(steps - 1, direction);
 
 		# Land -> Parent
 		for landmark in range(1, landmarks + 1):
+			print "PositionRow_{0},PositionCol_{0},ObserveLandmark{1}_{2}_{0} -- PositionRow_{0},PositionCol_{0},Action_{0}".format(steps - 2, landmark, direction);
 			print "PositionRow_{0},PositionCol_{0},ObserveLandmark{1}_{2}_{0} -- PositionRow_{0},PositionCol_{0},Action_{0}".format(steps - 1, landmark, direction);
-	
+
 	# Row_t, Col_t, Action_t -> Col_t-1, Action_t-1, Row_t, Col_t
 	print "PositionRow_{0},PositionCol_{0},Action_{0} -- PositionCol_{1},Action_{1},PositionRow_{0},PositionCol_{0}".format(steps - 1, steps - 2);
 		
