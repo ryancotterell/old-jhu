@@ -54,7 +54,7 @@ class Clique:
     self.factors = factors
     self.nodes = nodes
     self.neighbors = []
-  def add_neighbor(self, neighbor)
+  def add_neighbor(self, neighbor):
     self.neighbors.append(neighbor)
 
 class SepSet:
@@ -185,7 +185,7 @@ def add_entry_to_factor(factors, entry, value):
 # TODO(crankshaw) update all factors with no parents
 # so that the entries reflect the uniform distribution
 def update_cpds_for_single_node_factors(factors):
-  for factor in factors:
+  for f, factor in factors.iteritems():
     if len(factor.rvs) == 1:
       # this factor has no parents
       node = factor.rvs[0]
@@ -193,6 +193,7 @@ def update_cpds_for_single_node_factors(factors):
         raise Exception('factor has one node that has parents')
       # fill in CPT with uniform distribution
       factor.cpt = np.ones(len(node.values))/np.float64(len(node.values))
+      print factor
 
 def create_cliques(clique_file, factors):
   with open(clique_file, 'r') as read_cliques:
@@ -229,8 +230,8 @@ def main(netfile, cpdfile):
   factors = create_factors(nodes)
   parse_cpd(nodes, factors, cpdfile) 
   update_cpds_for_single_node_factors(factors)
-  for f in factors:
-    print factors[f]
+  #for f in factors:
+    #print factors[f]
   # I now have all of my factors complete with cpds
   # time to put them into clique
 
