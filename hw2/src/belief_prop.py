@@ -165,8 +165,55 @@ def test_multiply_factors():
   print result2
   
 
-def divide_factors(phi1, phi2):
-  return 0
+# computes factor quotient of psi / phi
+def divide_factors(psi, phi):
+  psi_set = set(psi.rvs)
+  phi_set = set(phi.rvs)
+  if not phi_set <= psi_set:
+    raise Exception('malformed denominator')
+  dims = []
+  for r in psi.rvs:
+    dims.append(len(r.values))
+  shape = np.zeros(dims)
+  result = np.zeros(dims)
+  
+  it = np.nditer(shape, flags=['multi_index'])
+  while not it.finished:
+    phi_index = []
+    for i, ix in zip(psi.rvs,  range(len(psi.rvs))):
+      if i in phi.rvs:
+        phi_index.append(it.multi_index[ix])
+    phi_index = tuple(phi_index)
+    full_ind = tuple(it.multi_index)
+    if phi.cpt[phi_index] == 0:
+      if psi.cpt[full_ind] != 0:
+        raise Exception('division by zero')
+    else:
+      result[tuple(it.multi_index)] = psi.cpt[full_ind] / phi.cpt[phi_index]
+    it.iternext()
+  
+  return Factor(phi.rvs, result)
+
+def test_divide_factors():
+  rv1 = Node('a', [1, 2, 3])
+  rv2 = Node('b', [1, 2])
+  psi = Factor([rv1, rv2], cpt=None)
+  phi = Factor([rv1], cpt=None)
+  e1 = {'a': 1, 'b': 1} # 0.5
+  psi.update_cpt_entry(e1, 0.5)
+  e2 = {'a': 1, 'b': 2} # 0.8
+  psi.update_cpt_entry(e2, 0.2)
+  e4 = {'a': 3, 'b': 1} # 0.3)
+  psi.update_cpt_entry(e4, 0.3)
+  e5 = {'a': 3, 'b': 2} # 0.9
+  psi.update_cpt_entry(e5, 0.45)
+
+  f1 = {'a': 1} # 0.5
+  phi.update_cpt_entry(f1, 0.8)
+  f3 = {'a': 3} # 0.5
+  phi.update_cpt_entry(f3, 0.6)
+  result1 = divide_factors(psi, phi)
+  print result1
 
 
 def parse_network(netfile):
@@ -319,7 +366,8 @@ def main(netfile, cpdfile):
 if __name__=='__main__':
   # print sys.argv
   # main(sys.argv[1], sys.argv[2])
-  test_multiply_factors()
+  # test_multiply_factors()
+  test_divide_factors()
 
 
 
