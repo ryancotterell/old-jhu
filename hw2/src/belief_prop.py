@@ -5,10 +5,14 @@ import functools
 
 # we store CPD of a factor in a numpy ndarray
 class Factor:
-  def __init__(self, rvs):
-    self.rvs = rvs
+  def __init__(self, rvs, cpt=None):
+    rvs.sort()
+    self.rvs = list(rvs)
     self.rvs.sort()
-    self.cpt = self._init_cpt(rvs)
+    if cpt == None:
+      self.cpt = self._init_cpt(rvs)
+    else:
+      self.cpt = np.copy(cpt)
     
   def _init_cpt(self, rvs):
     dims_list = []
@@ -99,9 +103,67 @@ class Node:
     return self.name == other.name
   def __lt__(self, other):
     return self.name < other.name
+  def __hash__(self):
+    return hash(self.name)
 
 def multiply_factors(phi1, phi2):
-  return 0
+  rv_union = set(phi1.rvs).union(set(phi2.rvs))
+  rv_union_list = list(rv_union)
+  rv_union_list.sort()
+  dims = []
+  for r in rv_union_list:
+    dims.append(len(r.values))
+  shape = np.zeros(dims)
+  product = np.zeros(dims)
+  
+  it = np.nditer(shape, flags=['multi_index'])
+  while not it.finished:
+    phi1_index = []
+    for i, ix in zip(rv_union_list, range(len(rv_union_list))):
+      if i in phi1.rvs:
+        phi1_index.append(it.multi_index[ix])
+    phi2_index = []
+    for i, ix in zip(rv_union_list, range(len(rv_union_list))):
+      if i in phi2.rvs:
+        phi2_index.append(it.multi_index[ix])
+    phi1_index = tuple(phi1_index)
+    phi2_index = tuple(phi2_index)
+    product[tuple(it.multi_index)] = phi1.cpt[phi1_index] * phi2.cpt[phi2_index]
+    it.iternext()
+  
+  return Factor(rv_union_list, product)
+    
+def test_multiply_factors():
+  rv1 = Node('a', [1, 2, 3])
+  rv2 = Node('b', [1, 2])
+  rv3 = Node('c', [1, 2])
+  phi1 = Factor([rv1, rv2], cpt=None)
+  phi2 = Factor([rv2, rv3], cpt=None)
+  e1 = {'a': 1, 'b': 1} # 0.5
+  phi1.update_cpt_entry(e1, 0.5)
+  e2 = {'a': 1, 'b': 2} # 0.8
+  phi1.update_cpt_entry(e2, 0.8)
+  e3 = {'a': 2, 'b': 1} # 0.1
+  phi1.update_cpt_entry(e3, 0.1)
+  e4 = {'a': 3, 'b': 1} # 0.3)
+  phi1.update_cpt_entry(e4, 0.3)
+  e5 = {'a': 3, 'b': 2} # 0.9
+  phi1.update_cpt_entry(e5, 0.9)
+
+  f1 = {'b': 1, 'c': 1} # 0.5
+  phi2.update_cpt_entry(f1, 0.5)
+  f2 = {'b': 1, 'c': 2} # 0.7
+  phi2.update_cpt_entry(f2, 0.7)
+  f3 = {'b': 2, 'c': 1} # 0.1
+  phi2.update_cpt_entry(f3, 0.1)
+  f4 = {'b': 2, 'c': 2} # 0.2
+  phi2.update_cpt_entry(f4, 0.2)
+  result1 = multiply_factors(phi1, phi2)
+  result2 = multiply_factors(phi2, phi1)
+  print result1
+  print '\n'
+  print result2
+  
 
 def divide_factors(phi1, phi2):
   return 0
@@ -179,6 +241,15 @@ def add_entry_to_factor(factors, entry, value):
   key = frozenset(iter(entry))
   factor = factors[key]
   factor.update_cpt_entry(entry, value)
+
+def add_entry_to_factor_test(factor, entry, value):
+  # key is an immutable set of the names of all RVs in the factor
+  # keyset = set()
+  # for name in entry:
+  #     keyset.add(name)
+  key = frozenset(iter(entry))
+  factor = factors[key]
+  factor.update_cpt_entry(entry, value)
   
   
 
@@ -235,16 +306,20 @@ def main(netfile, cpdfile):
   # I now have all of my factors complete with cpds
   # time to put them into clique
 
-  # TODO I think the alphabetical ordering of my RVs within
-  # the factors isn't working. My lookup scheme for the factors
-  # (creating the dummy factors) also isn't working.
+########################################################
+######################### TODO #########################
+  # implement multiplication, division of factors
+  # implement clique tree calibration
+  # answer queries
 
+########################################################
 
 
 
 if __name__=='__main__':
   # print sys.argv
-  main(sys.argv[1], sys.argv[2])
+  # main(sys.argv[1], sys.argv[2])
+  test_multiply_factors()
 
 
 

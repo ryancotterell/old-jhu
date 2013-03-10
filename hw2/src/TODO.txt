@@ -1,0 +1,18 @@
+If we are having speed issues, I can create a lookup
+table to substitute the RV string names with a number
+so that we are mostly doing number comparisons instead
+of string comparisons
+
+
+for RV in RV_Union:
+  assignment[RV] = 0
+
+phi1_var = 0
+phi2_var = 0
+for i in range(num_settings): #number of different combos of settings of RVs
+  product[i] = phi1[phi1_var] * phi2[phi2_var] 
+  for RV in RV_Union:
+    
+
+
+
