@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 import functools
+import random
 
 
 # we store CPD of a factor in a numpy ndarray
@@ -58,13 +59,59 @@ class Clique:
     self.factors = factors
     self.nodes = nodes
     self.neighbors = []
+    self.belief = None
   def add_neighbor(self, neighbor):
     self.neighbors.append(neighbor)
+
+  def collect_message(self, requester, sepsets):
+    nbr_set = set(self.neighbors)
+    # BASE CASE
+    if set(requester) == nbr_set:
+      self.send_message(requester, sepsets)
+    # else we wait for all our children to send messages to us, then we send
+    # our message back up to the requester (i.e. parent)
+    else:
+      nbr_set.remove(requester)
+      for n in nbr_set:
+        n.collect_message(self)
+      self.send_message(requester, sepsets)
+  
+  def send_message(self, dest, sepsets):
+    common_nodes = set(self.nodes).intersection(set(dest.nodes))
+    marginal = marginalize_factor(self.belief, common_nodes)
+    node_names = [n.name for n in common_nodes]
+    relevant_sepset = sepsets[frozenset(node_names)]
+    divided_message = divide_factors(marginal, relevant_sepset.message)
+    dest.belief = multiply_factors(dest.belief, divided_message)
+    relevant_sepset.message = marginal
+  
+  def distribute_message(self, sender, sepsets):
+    nbr_set = set(self.neighbors)
+    # have the sender send us the message
+    sender.send_message(self, sepsets)
+    # BASE CASE
+    if set(sender) == nbr_set:
+      # done
+    else:
+      nbr_set.remove(sender)
+      for n in nbr_set:
+        n.distribute_message(self, sepsets)
+      
+      
+  
+    
+    
+    
 
 class SepSet:
   def __init__(self, c1, c2):
     self.i = c1
     self.j = c2
+    self.nodes = list(set(self.i.nodes).intersection(self.j.nodes))
+    self.nodes.sort()
+    dims = [len(r.values) for r in self.nodes]
+    self.message = np.ones(dims)
+
   def __eq__(self, other):
     if (self.i == other.i and self.j == other.j):
       return True
@@ -132,6 +179,22 @@ def multiply_factors(phi1, phi2):
     it.iternext()
   
   return Factor(rv_union_list, product)
+
+def marginalize_factor(factor, remaining_rvs):
+  dims = [len(r.values) for r in remaining_rvs]
+  shape = np.zeros(dims)
+  result = np.zeros(dims)
+
+  it = np.nditer(factor.cpt, flags=['multi_index'])
+  while not it.finished:
+    marginal_index = []
+    for i, ix in zip(factor.rvs, range(len(factor.rvs))):
+      if i in remaining_rvs:
+        marginal_index.append(it.multi_index[ix])
+    marginal_index = tuple(marginal_index)
+    result[marginal_index] = result[marginal_index] + factor.cpt[tuple(it.multi_index)]
+    it.iternext()
+  return Factor(factor.rvs, result)
     
 def test_multiply_factors():
   rv1 = Node('a', [1, 2, 3])
@@ -327,7 +390,7 @@ def create_cliques(clique_file, factors):
         if i <= current_clique:
           factors_in_clique[i] = f
       cliques[current_clique] = Clique(factors_in_clique, current_clique)
-    sepsets = []
+    sepsets = {}
     for line in read_cliques:
       parts = line.strip().split(' ')
       if len(parts) != 3:
@@ -336,27 +399,47 @@ def create_cliques(clique_file, factors):
       second_clique_set = frozenset(parts[2].split(','))
       first_clique = cliques[first_clique_set]
       second_clique = cliques[second_clique_set]
-      sepsets.append(SepSet(first_clique, second_clique))
+      # the names of all the nodes that the two cliques have in common
+      sepset_name = frozenset(first_clique_set.intersection(second_clique_set))
+      sepsets[sepset_name] = SepSet(first_clique, second_clique)
       first_clique.add_neighbor(second_clique)
       second_clique.add_neighbor(first_clique)
   return (cliques, sepsets)
       
+def initialize_cliquetree(cliques, sepsets):
+  for cname, c in cliques.iteritems():
+    c.belief = c.factors[0]
+    for i in range(1, len(c.factors)):
+      c.belief = multiply_factors(c.belief, c.factors[i])
+ 
+def calibrate_cliquetree(cliques, sepsets):
+  # pick arbitrary root
+  root = random.randint(len(cliques))
+  # upward pass
+  for n in root.neighbors:
+    n.collect_message(root, sepsets):
+  # downward pass
+  for n in root.neighbors:
+    n.distribute_message(root, sepsets)
     
+    
+  
 
-def main(netfile, cpdfile):
+def main(netfile, cpdfile, cliquefile):
   nodes = parse_network(netfile)
   factors = create_factors(nodes)
   parse_cpd(nodes, factors, cpdfile) 
   update_cpds_for_single_node_factors(factors)
-  #for f in factors:
-    #print factors[f]
-  # I now have all of my factors complete with cpds
-  # time to put them into clique
+  cliques, sepsets = create_cliques(cliquefile, factors)
+  initialize_cliquetree(cliques, sepsets)
+  calibrate_cliquetree(cliques, sepsets)
+  # TODO could test this by making sure it satisfies the clique tree invariant
+  calibrated_cliques = cliques.copy()
+  calibrated_sepsets = cliques.copy()
+  
 
 ########################################################
-######################### TODO #########################
-  # implement multiplication, division of factors
-  # implement clique tree calibration
+#                         TODO                         
   # answer queries
 
 ########################################################
