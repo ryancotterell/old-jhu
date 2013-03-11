@@ -78,9 +78,44 @@
 	
 	% 3.2.1
 	\begin{enumerate}
-		\item
-		\item 
-		\item
+		\item The process we used to create the clique tree is drawn out graphically
+		in the file {\tt CliqueTree Building.pdf}. The strategy we took was to try and do
+		a small example (when the number of steps = 3), then try to generalize
+		that clique tree to any arbitrary number of time steps.
+		
+		We made it as the instructions said: we converted the original graph into an
+		undirected graph by marrying the parents of nodes at a v-structure; we converted
+		the graph to a chordal graph, and verified that it was a valid chordal graph; we 
+		extracted the maximal cliques from the graph and formed the cluster graph over
+		these cliques; finally, we found a maximal spanning tree that we thought made
+		sense intuitively and could generalize. We tried to select the MST such that there
+		was a pattern in the structure that we could generalize. 
+		
+		When we were selecting the MST, we could have selected a different, but equally 
+		valid MST that would have produced another clique tree that is different from what 
+		we used. The ordering which we selected nodes in the algorithm to create a chordal
+		graph was also important because if you did not select the nodes in an intelligent
+		order, it was possible that the chordal graph would have been connected in a strange
+		way. For example, there was a possibility that {\tt PositionRow\_t-1} would have
+		been directly connected to {\tt PositionRow\_t+1}. If we allowed for that to happen,
+		I believe that our resulting clique tree might be larger, more complicated, or less
+		intuitive.
+		
+		\item We have verified that the running intersection property holds. We wrote a 
+		program in {\tt test.RunningIntersectionChecker.java} that takes a list of the
+		the variables and finds all of the cliques whose scope contains them. Then we
+		ran a breadth-first search to find a path, only adding an edge to the queue if the
+		other clique contained that same variable. If for all variables and for all of the
+		cliques contain them in their scope, there exists a path from each clique
+		to every other clique such that all of the cliques along that path contain the
+		variable in their scope, then the running intersection property holds. Our program
+		verified that our clique trees are correct.
+		
+		\item We made the {\tt cliquetree} file by generalizing the clique tree that we
+		came up with in {\tt CliqueTree Building.pdf}. We then wrote a Python script to
+		output a clique tree for an arbitrary number of time steps and landmarks, the
+		only variables that change between each clique tree. The script that we wrote is
+		called {\tt create-clique.py}.
 	\end{enumerate}		
 	
 	\setcounter{subsubsection}{4}
