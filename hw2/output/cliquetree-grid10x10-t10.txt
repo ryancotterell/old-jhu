@@ -274,4 +274,5 @@ PositionRow_8,PositionCol_8,ObserveLandmark1_W_8 -- PositionRow_8,PositionCol_8,
 PositionRow_9,PositionCol_9,ObserveLandmark1_W_9 -- PositionRow_9,PositionCol_9,Action_9
 PositionRow_8,PositionCol_8,ObserveLandmark2_W_8 -- PositionRow_8,PositionCol_8,Action_8,PositionRow_9
 PositionRow_9,PositionCol_9,ObserveLandmark2_W_9 -- PositionRow_9,PositionCol_9,Action_9
+PositionRow_8,PositionCol_8,Action_8,PositionRow_9 -- PositionCol_8,Action_8,PositionRow_9,PositionCol_9
 PositionRow_9,PositionCol_9,Action_9 -- PositionCol_8,Action_8,PositionRow_9,PositionCol_9

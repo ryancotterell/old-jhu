@@ -84,6 +84,9 @@ def main():
 			print "PositionRow_{0},PositionCol_{0},ObserveLandmark{1}_{2}_{0} -- PositionRow_{0},PositionCol_{0},Action_{0},PositionRow_{3}".format(steps - 2, landmark, direction, steps - 1);
 			print "PositionRow_{0},PositionCol_{0},ObserveLandmark{1}_{2}_{0} -- PositionRow_{0},PositionCol_{0},Action_{0}".format(steps - 1, landmark, direction);
 
+	# Row_t, Col_t, Action_t, Row_t+1 -> Col_t, Action_t, Row_t+1, Col_t+1
+	print "PositionRow_{0},PositionCol_{0},Action_{0},PositionRow_{1} -- PositionCol_{0},Action_{0},PositionRow_{1},PositionCol_{1}".format(steps - 2, steps - 1);
+
 	# Row_t, Col_t, Action_t -> Col_t-1, Action_t-1, Row_t, Col_t
 	print "PositionRow_{0},PositionCol_{0},Action_{0} -- PositionCol_{1},Action_{1},PositionRow_{0},PositionCol_{0}".format(steps - 1, steps - 2);
 		

@@ -3594,4 +3594,5 @@ PositionRow_98,PositionCol_98,ObserveLandmark2_W_98 -- PositionRow_98,PositionCo
 PositionRow_99,PositionCol_99,ObserveLandmark2_W_99 -- PositionRow_99,PositionCol_99,Action_99
 PositionRow_98,PositionCol_98,ObserveLandmark3_W_98 -- PositionRow_98,PositionCol_98,Action_98,PositionRow_99
 PositionRow_99,PositionCol_99,ObserveLandmark3_W_99 -- PositionRow_99,PositionCol_99,Action_99
+PositionRow_98,PositionCol_98,Action_98,PositionRow_99 -- PositionCol_98,Action_98,PositionRow_99,PositionCol_99
 PositionRow_99,PositionCol_99,Action_99 -- PositionCol_98,Action_98,PositionRow_99,PositionCol_99
