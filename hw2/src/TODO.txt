@@ -15,4 +15,4 @@ for i in range(num_settings): #number of different combos of settings of RVs
     
 
 
-
+probably need to change to log probabilities!!!!!!!!!!!!!
