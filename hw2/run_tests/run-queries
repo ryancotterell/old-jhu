@@ -1,0 +1,13 @@
+java -cp bin bp/Main data/network-grid10x10-t10.txt data/cpd-grid10x10-t10.txt data/cliquetree-grid10x10-t10.txt data/finalposition-grid10x10-t10.txt > results-grid10x10-t10.txt
+
+java -cp bin bp/Main data/network-grid10x10-t10.txt data/cpd-grid10x10-t10.txt data/cliquetree-grid10x10-t10.txt data/finalposition-inverse-grid10x10-t10.txt > results-grid10x10-t10-inverse.txt
+
+java -cp bin bp/Main data/network-grid10x10-t100.txt data/cpd-grid10x10-t100.txt data/cliquetree-grid10x10-t100.txt data/finalposition-grid10x10-t100.txt > results-grid10x10-t100.txt
+
+java -cp bin bp/Main data/network-grid10x10-t100.txt data/cpd-grid10x10-t100.txt data/cliquetree-grid10x10-t100.txt data/finalposition-inverse-grid10x10-t100.txt > results-grid10x10-t100-inverse.txt
+
+java -cp bin bp/Main data/network-grid10x10-t1000.txt data/cpd-grid10x10-t1000.txt data/cliquetree-grid10x10-t1000.txt data/finalposition-grid10x10-t1000.txt > results-grid10x10-t1000.txt
+
+java -cp bin bp/Main data/network-grid10x10-t1000.txt data/cpd-grid10x10-t1000.txt data/cliquetree-grid10x10-t1000.txt data/finalposition-inverse-grid10x10-t1000.txt > results-grid10x10-t1000-inverse.txt
+
+java -cp bin bp/Main data/network-grid25x25-t100.txt data/cpd-grid25x25-t100.txt data/cliquetree-grid25x25-t100.txt data/queries-25x25-t100.txt > results-grid25x25-t100.txt
