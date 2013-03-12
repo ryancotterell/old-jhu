@@ -200,8 +200,26 @@
 		We were unable to have our {\tt bayes-query-sp} program terminate on the largest file,
 		{\tt network-grid10x10-t1000.txt}.
 		
-		\item
-		\item
+		\item The set of queries that can be located in file {\tt problem2.txt} ask for the probability
+		of:
+		\begin{verbatim}
+		    ObserveLandmark1_N_8 evidence
+		    ObserveLandmark1_E_8
+		    ObserveLandmark1_S_8
+		    ObserveLandmark1_W_8
+		\end{verbatim}
+		Those probabilities were equal to 0.1703, 0.1707 0.1700, and 01698, respectively. 
+
+		\item In order to compute this probability, we know that we can't simply perform
+		the query because there is no clique in the clique tree with all four position vectors.
+		In order to get around that, we're going to use the chain rule of probability:
+		\[P(\textrm{Position\_0, Position\_1} \,|\, \textrm{evidence}) = 
+		P(\textrm{Poisition\_1} \,|\, \textrm{Position\_0})P(\textrm{Position\_0} \,|\, \textrm{evidence})\]	
+		This query can be found in the file {\tt problem3.txt}.
+		
+		The resulting probabilities of the two queries were 0.002507 and 0.001716. Thus, the
+		combined result is 4.302E-6
+		
 		\item Since we were instructed now to implement algorithm 10.4, which would have allowed to compute the joint probability of random variables assigned to different cliques, we resorted to the chain rule of probability. 
 		$$
 		p(A,B,\ldots,Z) = p(A)p(B|A)\ldots p(Z|A,B\ldots,Y)
