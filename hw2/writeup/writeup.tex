@@ -132,7 +132,9 @@
 		    ...
 		    PositionRow_t=10,PositionCol_t=10
 		\end{verbatim}
-		for $t = 9, 99$ and $999$.
+		for $t = 9, 99$ and $999$. These query files are located in the subdirectory
+		{\tt queries} and are {\tt problem1-t10.txt},  {\tt problem1-t100.txt}, and
+		{\tt problem1-t1000.txt}.
 		
 		For the {\tt network-grid10x10-t10.txt} file, our resulting probabilities were:
 		\begin{center}
@@ -156,14 +158,14 @@
 		Where the value at row $i$ and column $j$ is the percent probability of the
 		robot ending up at position $(i,j)$.
 
-		\begin{figure}[H!]
-			\label{contour10}
+		\begin{figure}[h]
+			\label{fig:contour10}
 			\begin{center}
 				\includegraphics[scale=0.75]{t10-contour.eps}
 			\end{center}
 			\caption{The contour plot for t10}
 		\end{figure}
-		As you can see from the contour plot for t10 in Figure \ref{contour10}, the most
+		As you can see from the contour plot for t10 in Figure \ref{fig:contour10}, the most
 		likely location for the robot at time $t=9$ is the top middle of the map.
 		
 		For the {\tt network-grid10x10-t100.txt} file, our resulting probabilities were:
@@ -185,22 +187,69 @@
 				\hline
 			\end{tabular}
 		\end{center}
-		and the corresponding contour plot is in Figure \ref{contour100}. From the Figure,
+		and the corresponding contour plot is in Figure 2. From the Figure,
 		you can see that the robot is likely in the middle or the bottom right of the map.
 		\begin{figure}[h]
-			\label{contour100}
+			\label{fig:contour100}
 			\begin{center}
 				\includegraphics[scale=.75]{t100-contour.eps}
 			\end{center}
 			\caption{The contour plot for t100}
 		\end{figure}
 		
+		We were unable to have our {\tt bayes-query-sp} program terminate on the largest file,
+		{\tt network-grid10x10-t1000.txt}.
 		
 		\item
 		\item
-		\item
-		\item
-		\item
+		\item Since we were instructed now to implement algorithm 10.4, which would have allowed to compute the joint probability of random variables assigned to different cliques, we resorted to the chain rule of probability. 
+		$$
+		p(A,B,\ldots,Z) = p(A)p(B|A)\ldots p(Z|A,B\ldots,Y)
+		$$
+		Thus we could query each individual variable separately conditioning on the previous 
+		variables. We can then simple that the product ($\otimes$ of the semiring which is + 
+		in logspace). After words we took the -log of the probability and reported it. 
+		
+		The query file that was written for this is located in the subdirectory {\tt queries}
+		with the file name {\tt problem4.txt}.
+		
+		\item In order to compare how much faster our program runs with the incremental
+		updates, we took the queries from the previous problem, and altered them such that
+		on every line, all of the evidence that we know to be true is given. We ran the queries
+		from the previous problem (one piece of new evidence added per line) with the 
+		incremental updates enabled. This took 11.739 seconds as measured by {\tt time}.
+		Then we disabled the incremental updates in our program and ran the altered
+		query file. This took 83.127 seconds as measured by {\tt time}. 
+		
+		With the altered query file, we needed to add all of the evidence we knew at that
+		line to be true to the right hand side of the query because the clique tree was
+		reinitialized for every query execution. This was how we disabled the incremental
+		updates. The results of both the enabled and disabled versions were the same, but
+		the disabled version took much longer. The query file we ran with incremental
+		updates enabled is called {\tt problem5-enabled.txt}, and the file we ran with
+		updates disabled is called {\tt problem5-disabled.txt}. Both of these files can be
+		found in the subdirectory {\tt queries}. 
+		
+		Note, if you want to verify these results, you may have to contact us because
+		in order to measure the time without incremental updates, we had to edit the
+		source of our program.
+		
+		\item 
+		There are many problems with this comparison for our particular case. Specifically, 
+		we implemented variable elimination instead of the brute force method for the first homework.
+		 Secondly, we did them in two different languages. We understand that the point of this 
+		 assignment is to demonstrate to us the practical need for efficient algorithm en lieu 
+		 of brute force. The experiment was designed as follows: we ran both Belief Propagation
+		 and Variable Elimination on \texttt{network-10-8.txt} and \texttt{grid10x10-t10.txt}. 
+		 The BP ran instantly (on the order of milliseconds) on both maps whereas the Python
+		 implementation of Variable Elimination ran instantly (milliseconds) on the
+		 \texttt{network-10-8.txt} but ate up all the memory after 30 minutes on the 
+		 \texttt{grid10x10-t10.txt}. In fact, it called the OOM-killer much to my dismay. 
+		 What is more, the Python implementation ran in \texttt{grid10x10-t10.txt} ran in 
+		 10 milliseconds whereas the Java BP ran in 30 milliseconds on the same map; we 
+		 attribute this to the start up time for JVM. I wish it were possible to do a more robust 
+		 comparison, but I feel after talking to several of my classmates, I am thoroughly convinced 
+		 that brute force is a bad approach. 
 	\end{enumerate}
 	
 	\subsubsection{Extra Credit: Max-Product Message Passing}
@@ -215,7 +264,63 @@
 	
 	% 3.3
 	\begin{enumerate}
-		\item 
+		\item $$
+P(\mathcal{D}|\mathcal{G}) = \prod_i \prod_{u_i \in Val{Pa^{\mathcal{G}}_{X_i}}} \frac{\Gamma(\alpha_{X_i|u_i}^{\mathcal{G}})}{\Gamma(\alpha_{X_i}^\mathcal{G} + M[u_i])} \prod_{x_i^j \in Val(X_i) } \frac{\Gamma(\alpha_{x_i^j} + M[x_i^j,u_i]}{\Gamma{\alpha_{x_i^j | u_i}^\mathcal{G}}}
+$$
+$$
+\log(P(\mathcal{D}|\mathcal{G})) = \sum_i \sum_{u_i \in Val(Pa^{\mathcal{G}}_{X_i})} \log\left(\frac{\Gamma(\alpha_{X_i|u_i}^{\mathcal{G}})}{\Gamma(\alpha_{X_i}^\mathcal{G} + M[u_i])} \prod_{x_i^j \in Val(X_i) } \frac{\Gamma(\alpha_{x_i^j} + M[x_i^j,u_i]}{\Gamma{\alpha_{x_i^j | u_i}^\mathcal{G}}}\right)
+$$
+$$
+\log(P(\mathcal{D}|\mathcal{G})) = \sum_i \sum_{u_i \in Val(Pa^{\mathcal{G}}_{X_i})} \left( \log\left(\frac{\Gamma(\alpha_{X_i|u_i}^{\mathcal{G}})}{\Gamma(\alpha_{X_i}^\mathcal{G} + M[u_i])} \right) + \sum_{x_i^j \in Val(X_i) } \log\left(\frac{\Gamma(\alpha_{x_i^j} + M[x_i^j,u_i]}{\Gamma{\alpha_{x_i^j | u_i}^\mathcal{G}}}\right)\right)
+$$
+$$
+\sum_i \sum_{u_i \in Val(Pa^{\mathcal{G}}_{X_i})} \left( \log\left(\frac{\sqrt{2\pi} {\alpha_{X_i}^\mathcal{G}}^{\left(\alpha_{X_i}^\mathcal{G} - \frac{1}{2}\right)}e^{-\alpha_{X_i}^\mathcal{G}}}{\sqrt{2\pi}{\left(\alpha_{X_i}^\mathcal{G} + M[u_i]\right)}^{\left(\alpha_{X_i}^\mathcal{G} + M[u_i] - \frac{1}{2} \right)}e^{-\alpha_{X_i}^\mathcal{G} + M[u_i]}} \right) + \sum_{x_i^j \in Val(X_i) } \log\left(\frac{ \sqrt{2\pi} \left(\alpha_{x_i^j} + M[x_i^j,u_i]\right)^{\left(\alpha_{x_i^j} + M[x_i^j,u_i] - \frac{1}{2}\right)}e^{-\alpha_{x_i^j} + M[x_i^j,u_i]}}{\sqrt{2\pi} \left(\alpha_{x_i^j | u_i}^\mathcal{G}\right)^{\left(\alpha_{x_i^j | u_i}^\mathcal{G} - \frac{1}{2}\right)}e^{-\alpha_{x_i^j | u_i}^\mathcal{G}}}\right)\right)
+$$
+\begin{multline*}
+\sum_i \sum_{u_i \in Val(Pa^{\mathcal{G}}_{X_i})} \left( \log\left(\frac{ {\alpha_{X_i}^\mathcal{G}}^{\left(\alpha_{X_i}^\mathcal{G} - \frac{1}{2}\right)}e^{-	M[u_i]}}{{\left(\alpha_{X_i}^\mathcal{G} + M[u_i]\right)}^{\left(\alpha_{X_i}^\mathcal{G} + M[u_i] - \frac{1}{2} \right)}} \right) + \sum_{x_i^j \in Val(X_i) } \log\left(\frac{ \left(\alpha_{x_i^j} + M[x_i^j,u_i]\right)^{\left(\alpha_{x_i^j} + M[x_i^j,u_i] - \frac{1}{2}\right)}e^{- M[x_i^j,u_i]}}{ \left(\alpha_{x_i^j | u_i}^\mathcal{G}\right)^{\left(\alpha_{x_i^j | u_i}^\mathcal{G} - \frac{1}{2}\right)}}\right)\right)
+\end{multline*}
+\newpage
+We whiteboarded the above to get it in the form below. It is not difficult to see how this  would happen. When you push in the log the exponents are going to come down with the $\log$. We didn't show this because would take up a lot more space and is not very interesting. 
+Latex's multiline mode messed up the parentheses. 
+\begin{multline*}
+\sum_i \sum_{u_i} (\alpha_{X_i|u_i}^G - \frac{1}{2}) \ln (\alpha_{X_i|u_i}^G ) - (\alpha_{X_i|u_i}^G   - \frac{1}{2})\ln(\alpha_{X_i|u_i}^G  + M[u_i] )  + M[u_i] + \\ \sum_j \left( (\alpha_{x_i^j|u_i}^G - \frac{1}{2}) \ln(\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]) + M[x_i^j,u_i] - (\alpha_{x_i^j|u_i} - \frac{1}{2})\ln(\alpha_{x_i^j|u_i}) \right)
+\end{multline*}
+
+
+\begin{multline*}
+\sum_i \sum_{u_i} (\alpha_{X_i|u_i}^G - \frac{1}{2}) \ln (\alpha_{X_i|u_i}^G ) - (\alpha_{X_i|u_i}^G  -  \frac{1}{2} + M[u_i])\ln(\alpha_{X_i|u_i}^G  + M[u_i] ) + \\ \sum_j \left( (\alpha_{x_i^j|u_i}^G - \frac{1}{2} -  M[x_i^j,u_i]) \ln(\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]) - (\alpha_{x_i^j|u_i} - \frac{1}{2})\ln(\alpha_{x_i^j|u_i}) \right)
+\end{multline*}
+\begin{multline*}
+\sum_i \sum_{u_i} (\alpha_{X_i|u_i}^G - \frac{1}{2}) \ln (\alpha_{X_i|u_i}^G ) - (\alpha_{X_i|u_i}^G  -  \frac{1}{2}) \ln(\alpha_{X_i|u_i}^G  + M[u_i] )   + (M[u_i] \ln(\alpha_{X_i|u_i}^G  + M[u_i] ) - \\ \sum_j \left( (\alpha_{x_i^j|u_i}^G - \frac{1}{2}) \ln(\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]) + M[x_i^j,u_i] \ln(\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i])  - (\alpha_{x_i^j|u_i} - \frac{1}{2})\ln(\alpha_{x_i^j|u_i}) \right)
+\end{multline*}
+\begin{multline*}
+\sum_i \sum_{u_i} (\alpha_{X_i|u_i}^G - \frac{1}{2}) \ln (\frac{\alpha_{X_i|u_i}^G }{\alpha_{X_i|u_i}^G  + M[u_i]})  + (M[u_i] \ln(\alpha_{X_i|u_i}^G  + M[u_i] ) - \\ \sum_j \left( (\alpha_{x_i^j|u_i}^G - \frac{1}{2}) \ln(\frac{\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]}{  \alpha_{x_i^j|u_i}}   ) + M[x_i^j,u_i] \ln(\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i])  \right)
+\end{multline*}
+\begin{multline*}
+\sum_i \sum_{u_i} (\alpha_{X_i|u_i}^G - \frac{1}{2}) \ln (\frac{\alpha_{X_i|u_i}^G }{\alpha_{X_i|u_i}^G  + M[u_i]}) - \\ \sum_j \left( (\alpha_{x_i^j|u_i}^G - \frac{1}{2}) \ln(\frac{\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]}{  \alpha_{x_i^j|u_i}}   ) + M[x_i^j,u_i] \ln(\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]) -  (M[u_{ij}] \ln(\alpha_{X_i|u_i}^G  + M[u_i] )  \right)
+\end{multline*}
+\begin{multline*}
+\sum_i \sum_{u_i} (\alpha_{X_i|u_i}^G - \frac{1}{2}) \ln (\frac{\alpha_{X_i|u_i}^G }{\alpha_{X_i|u_i}^G  + M[u_i]}) - \\ \sum_j \left( (\alpha_{x_i^j|u_i}^G - \frac{1}{2}) \ln(\frac{\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]}{  \alpha_{x_i^j|u_i}}   ) + M[x_i^j,u_i] \ln(\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]) -  (M[x_i^j,u_j] \ln(\alpha_{X_i|u_i}^G  + M[u_i] )  \right)
+\end{multline*}
+\begin{multline*}
+\sum_i \sum_{u_i} (\alpha_{X_i|u_i}^G - \frac{1}{2}) \ln (\frac{\alpha_{X_i|u_i}^G }{\alpha_{X_i|u_i}^G  + M[u_i]}) - \\ \sum_j \left( (\alpha_{x_i^j|u_i}^G - \frac{1}{2}) \ln(\frac{\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]}{  \alpha_{x_i^j|u_i}}   ) + M[x_i^j,u_i] \ln(\frac{\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]}{\alpha_{X_i|u_i}^G  + M[u_i]})  \right)
+\end{multline*}
+
+\begin{multline*}
+\sum_i \sum_{u_i} (\alpha_{X_i|u_i}^G - \frac{1}{2}) \ln (\frac{\alpha_{X_i|u_i}^G }{\alpha_{X_i|u_i}^G  + M[u_i]}) - \\ \sum_j \left( (\alpha_{x_i^j|u_i}^G - \frac{1}{2}) \ln(\frac{\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]}{  \alpha_{x_i^j|u_i}}   ) + M[x_i^j,u_i] \ln(\frac{\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]}{\alpha_{X_i|u_i}^G  + M[u_i]})  \right)
+\end{multline*}
+
+Thus by rewriting and using the definition of the Likelihood score on Page 792, we get the following. Note we have removed the $\alpha$ since they are constant are dwarfed by $M$.
+
+$$
+\sum_i \sum_{u_i}\sum_j M[x_i^j,u_i] \ln(\frac{\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]}{\alpha_{X_i|u_i}^G  + M[u_i]}) = \ell(\hat{\theta}_{\mathcal{G}} : \mathcal{D})
+$$
+With some rewriting we get,
+$$ \ell(\hat{\theta}^\mathcal{G}) + \sum_i \sum_{u_i} (\alpha_{X_i|u_i}^G - \frac{1}{2}) \ln (\frac{\alpha_{X_i|u_i}^G }{\alpha_{X_i|u_i}^G  + M[u_i]}) - \sum_j \left( (\alpha_{x_i^j|u_i}^G - \frac{1}{2}) \ln(\frac{\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]}{  \alpha_{x_i^j|u_i}} )  \right)$$
+We can merge the two sums since $\sum_j$ iterations $|X_i$ times
+$$ \ell(\hat{\theta}^\mathcal{G}) + \sum_i \sum_{u_i}\sum_j \frac{1}{|X_i|}\left((\alpha_{X_i|u_i}^G - \frac{1}{2}) \ln (\frac{\alpha_{X_i|u_i}^G }{\alpha_{X_i|u_i}^G  + M[u_i]}) \right) - \left( (\alpha_{x_i^j|u_i}^G - \frac{1}{2}) \ln(\frac{\alpha_{x_i^j|u_i}^G + M[x_i^j,u_i]}{  \alpha_{x_i^j|u_i}} )  \right)$$
+
+I couldn't really get the right part of this into the correct form, but intuitively it makes sense why it would be $\log(M)\dim(G)$. We are iterating $\dim{G}$ since by enumerating all the $i,u_i,j$ we are enumerating all the parameters. Then we just have to show that rest grows at a rate proportional to $\log(M)$.  This seems like it should be true, but that's about as far as I got. 
 	\end{enumerate}
 	
 \end{document}
