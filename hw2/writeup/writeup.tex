@@ -275,10 +275,21 @@
 	\subsubsection{Extra Credit: Max-Product Message Passing}
 	
 	% 3.2.6
-	\begin{enumerate}
-		\item
-		\item 
-	\end{enumerate}
+	We implemented the algorithm we semirings. This had two advantages;
+one it allowed for easy switching between logspace and probability
+space. It also allowed us to implement max-product with the tropical
+semiring.
+\begin{enumerate}
+	\item When you run $\texttt{bayes-query-mp}$ it will dump the
+unnormalized measure of the assignment containing the left hand
+limitations and conditioning on the right. We did not normalize this
+probability because we weren't entirely sure how and we also weren't
+sure how to analyze the left hand side of the query (we posted
+relevant Piazza posts for both).
+	\item We added simple backpointer in the Factor class using the
+method described in the book. It was bit tricky given our efficient
+marginalization algorithm,but it should work.
+\end{enumerate}
 	
 	\subsection{Bayesian Score for Bayesian Networks}
 	
