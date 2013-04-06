@@ -1,4 +1,0 @@
-G=Yes C=No,H=Yes
-G=No C=No,H=Yes
-I=Yes,D=Yes C=No,H=Yes,S=No
-I=No,D=No H=Yes,S=No
