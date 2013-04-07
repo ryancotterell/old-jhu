@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
-import driver.Main;
+import driver.CollapsedSampler;
 
 public class DataUtils
 {
@@ -55,7 +55,7 @@ public class DataUtils
 			
 			for (int i = 0; i < document.size(); i++)
 			{
-				int k = random.nextInt(Main.getNumberOfLabels());
+				int k = random.nextInt(CollapsedSampler.getNumberOfLabels());
 				
 				int c = document.getCorpus();
 				
