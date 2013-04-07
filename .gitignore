@@ -2,3 +2,8 @@
 *.log
 *.swp
 *.DS_Store
+
+\.classpath
+\.project
+
+*.class
