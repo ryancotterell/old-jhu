@@ -2,7 +2,6 @@ package driver;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import data.DataUtils;
@@ -11,10 +10,12 @@ import data.Multinomial;
 
 public class Main
 {
-	private static final String INPUT_FILE = "data/input-train.txt";
+	private static String trainingFile = "data/input-train.txt";
+	private static String testFile = "";
+	private static String outputFile = "";
 	
-	private static final int BURN_IN = 1000;
-	private static final int ITERATIONS = 1100;
+	private static int burnIn = 1000;
+	private static int iterations = 1100;
 	// the number of topics
 	private static int K = 25;
 	
@@ -42,7 +43,9 @@ public class Main
 	
 	public static void main(String[] args)
 	{
-		List<Document> trainingDocuments = DataUtils.loadData(Main.INPUT_FILE);
+		Main.readParameters(args);
+		
+		List<Document> trainingDocuments = DataUtils.loadData(Main.trainingFile);
 		
 		V = Document.vocabulary.size();
 		
@@ -68,7 +71,7 @@ public class Main
 		DataUtils.intialize(trainingDocuments, n_dk,n_kw,n_k,n_ckw,n_ck,z,x);
 		
 		// start sampling
-		for (int t = 0; t < Main.ITERATIONS; t++)
+		for (int t = 0; t < Main.iterations; t++)
 		{
 			// for each token (d,i)
 			for (int d = 0; d < trainingDocuments.size(); d++)
@@ -123,7 +126,7 @@ public class Main
 			double[][][] phi_c_k_w = Main.calculatePhi_c_k_w(t);
 		
 			
-			if (t > BURN_IN) {
+			if (t > burnIn) {
 				
 			}
 			// compute the log-likelihood
@@ -212,7 +215,7 @@ public class Main
 			{
 				phi_k_w[k][w] = (( n_kw[k][w] + beta) / (n_k[k] + V * beta));
 				
-				if (t > Main.BURN_IN) {
+				if (t > Main.burnIn) {
 					phi_k_w_samples[k][w] += phi_k_w[k][w];
 				}
 			}
@@ -232,7 +235,7 @@ public class Main
 				for (int c = 0; c < Document.getNumberOfCorpora(); c++) {
 					phi_c_k_w[c][k][w] = (( n_ckw[c][k][w] + beta) / (n_ck[c][k] + V * beta));
 					
-					if (t > Main.BURN_IN) {
+					if (t > Main.burnIn) {
 						phi_c_k_w_samples[c][k][w] += phi_c_k_w[c][k][w];
 					}
 				}
@@ -254,7 +257,7 @@ public class Main
 			
 			for (int k = 0; k < Main.K; k++) {
 				theta[d][k] = (n_dk[d][k] + Main.alpha) / (n_d + Main.K * Main.alpha);
-				if (t > Main.BURN_IN) {
+				if (t > Main.burnIn) {
 					theta_samples[d][k] += theta[d][k];
 				}
 			}
@@ -302,5 +305,21 @@ public class Main
 	public static int getNumberOfLabels()
 	{
 		return Main.K;
+	}
+	
+	private static void readParameters(String[] args)
+	{
+		if (args.length == 9)
+		{
+			Main.trainingFile = args[0];
+			Main.testFile = args[1];
+			Main.outputFile = args[2];
+			Main.K = Integer.parseInt(args[3]);
+			Main.lambda = Double.parseDouble(args[4]);
+			Main.alpha = Double.parseDouble(args[5]);
+			Main.beta = Double.parseDouble(args[6]);
+			Main.iterations = Integer.parseInt(args[7]);
+			Main.burnIn = Integer.parseInt(args[8]);
+		}
 	}
 }
