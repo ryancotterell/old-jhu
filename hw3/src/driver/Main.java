@@ -108,67 +108,39 @@ public class Main
 			}
 			
 			// estimate the parameters
-			
-			
 			double[][] theta = Main.calculateTheta(trainingDocuments);
-			
-			
-//			for (int d = 0; d < trainingDocuments.size(); d++)
-//			{
-//				Document document = trainingDocuments.get(d);
-//			
-//				int n_d = document.size();
-//				
-//				for (int k = 0; k < Main.K; k++)
-//					theta[d][k] = (n_dk[d][k] + Main.alpha) / (n_d + Main.K * Main.alpha);
-//			}
-				
 			double[][] phi_k_w = Main.calculatePhi_k_w();
 			double[][][] phi_c_k_w = Main.calculatePhi_c_k_w();
 			
-//			for (int k = 0; k < Main.K; k++)
-//			{
-//					
-//				for (int w = 0; w < Document.vocabulary.size(); w++)
-//				{
-//
-//					for (int c = 0; c < Document.getNumberOfCorpora(); c++) {
-//						phi_c_k_w[c][k][w] = (( n_ckw[c][k][w] + beta) / (n_ck[c][k] + V * beta));
-//					}
-//					
-//					phi_k_w[k][w] = (( n_kw[k][w] + beta) / (n_k[k] + V * beta));
-//				}
-//			}
-
-			// add this to your estimate of the expected value
-			
 			// compute the log-likelihood
-			double likelihood = 0.0;
-			for (int d = 0; d < trainingDocuments.size(); ++d)
-			{
-				Document currentDocument = trainingDocuments.get(d);
-				for (int i = 0; i < currentDocument.size(); ++i)
-				{
-					double logSum = 0;
-					for (int k = 0; k < Main.K; ++k)
-					{
-						int vocabIndex = Document.vocabulary.get(currentDocument.getWord(i));
-						logSum += theta[d][k]*(
-								(1-Main.lambda)*phi_k_w[k][vocabIndex]
-								+ Main.lambda*phi_c_k_w[currentDocument.getCorpus()][k][vocabIndex] );
-					}
-					if (logSum <= 0)
-						System.out.println(logSum);
-					likelihood += Math.log(logSum);
-				}
-			}
-			
-			System.out.println("Likelihood: " + likelihood);
-			
+			System.out.println("Likelihood: " + Main.computeLikelihood(trainingDocuments, theta, phi_k_w, phi_c_k_w));
 		}
 		
 		Main.extractTopcis();
 		
+	}
+	
+	private static double computeLikelihood(List<Document> documents, double[][] theta, double[][] phi_k_w, double[][][] phi_c_k_w)
+	{
+		double likelihood = 0.0;
+		for (int d = 0; d < documents.size(); ++d)
+		{
+			Document currentDocument = documents.get(d);
+			for (int i = 0; i < currentDocument.size(); ++i)
+			{
+				double logSum = 0;
+				for (int k = 0; k < Main.K; ++k)
+				{
+					int vocabIndex = Document.vocabulary.get(currentDocument.getWord(i));
+					logSum += theta[d][k]*(
+							(1-Main.lambda)*phi_k_w[k][vocabIndex]
+							+ Main.lambda*phi_c_k_w[currentDocument.getCorpus()][k][vocabIndex] );
+				}
+				likelihood += Math.log(logSum);
+			}
+		}
+		
+		return likelihood;
 	}
 	
 	private static void extractTopcis()
@@ -176,6 +148,7 @@ public class Main
 		try
 		{
 			FileWriter writer = new FileWriter("/Users/danieldeutsch/Desktop/hw3-files/output.txt");
+//			FileWriter writer = new FileWriter("data/output.txt");
 			double[][] phi_k_w = Main.calculatePhi_k_w();
 			
 			int counter = 1;
