@@ -32,9 +32,21 @@ public class DataUtils
 	/**
 	 * Initializes the z data member of the Main class and updates the n data member.
 	 */
-	public static void intializeZ(List<Document> documents, int[][] n_dk, int[][] n_kw, int[] n_k, int[][][] n_ckw, int[][] n_ck, int z[][])
+	public static void intialize(List<Document> documents, int[][] n_dk, int[][] n_kw, int[] n_k, int[][][] n_ckw, int[][] n_ck, int z[][], int[][] x)
 	{
 		Random random = new Random();
+		
+		
+		for (int d = 0; d < documents.size(); d++)
+		{
+			Document document = documents.get(d);
+			x[d] = new int[document.size()];
+			
+			for (int i = 0; i < document.size(); i++) {
+				x[d][i] = random.nextInt(2);
+			}
+		
+		}
 		
 		for (int d = 0; d < documents.size(); d++)
 		{
@@ -51,34 +63,20 @@ public class DataUtils
 				int w = Document.vocabulary.get(word);
 				
 				n_dk[d][k] += 1;
-				n_kw[k][w] += 1;
-				n_k[k] += 1;
-				n_ckw[c][k][w] += 1;
-				n_ck[c][k] += 1;
 				
+				if (x[d][i] == 0) {
+					n_kw[k][w] += 1;
+					n_k[k] += 1;
+				} else {
+				
+					n_ckw[c][k][w] += 1;
+					n_ck[c][k] += 1;
+				}
 				z[d][i] = k;
 				
 				
 			}
 
 		}
-	}
-	
-	public static void initializeX(List<Document> documents,int[][] x)
-	{
-		Random random = new Random();
-		
-		int d = 0;
-		for (Document document : documents)
-		{
-			x[d] = new int[document.size()];
-			
-			for (int i = 0; i < document.size(); i++) {
-				x[d][i] = random.nextInt(1);
-			}
-		
-			d++;
-		}
-		
 	}
 }
