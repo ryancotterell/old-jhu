@@ -1,0 +1,56 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\begin{document}
+We have 
+$$
+p(\mathbf{\theta},\mathbf{x},\mathbf{z},\phi | \mathbf{w},\alpha,\beta,\lambda) = \frac{p(\mathbf{\theta},\mathbf{x},\mathbf{z},\phi,\mathbf{w}|\alpha,\beta,\lambda)}{p(\mathbf{w}|\alpha,\beta,\lambda)}
+$$
+
+$$
+p(\mathbf{\theta},\mathbf{x},\mathbf{z},\phi,\mathbf{w} |\alpha,\beta,\lambda) = \prod_d^D p(\theta_d|\alpha) \prod_i^{N_d} \left[ p(z_{di}|\theta_i) p(w_{di} | z_{di},x_{di},c_{d},\phi_{z_{di}})p(x_{di}|w_{di},\lambda) \right] \prod_k^{K + CK} p(\phi_k|\beta) 
+$$
+Therefore we can just divide by $\prod_i^{N_d} p(w_{di} | z_{di},x_{di},c_{d},\phi_{z_{di}})$. Thus we get
+$$
+p(\mathbf{\theta},\mathbf{x},\mathbf{z},\phi |\mathbf{w} ,\alpha,\beta,\lambda) = \prod_d^D p(\theta_d|\alpha) \prod_i^{N_d} \left[ p(z_{di}|\theta_i) p(x_{di}|w_{di},\lambda) \right] \prod_k^{K + CK} p(\phi_k|\beta) 
+$$
+
+Removing the node $\mathbf{w}$  and $\mathbf{c}$ and all associated arcs in addition to the arc $(\theta,z)$. 
+We get the following mean field approximation
+$$
+q(\mathbf{\theta},\mathbf{z},\phi|\gamma,\delta,\epsilon,\psi) = \left[\prod_i^D q(\theta_i|\gamma)\prod_j^{N_d} q(z_{di}|\delta) q(x_{di}|\epsilon)\right] \prod_k^{K + CK} q(\phi_k|\psi)
+$$
+
+
+Now we want to minimize the Kullback-Leibler divergence 
+$$
+D(p||q) = D(p(\mathbf{\theta},\mathbf{x},\mathbf{z},\phi,\mathbf{w},\mathbf{c} |\alpha,\beta,\lambda) || q(\mathbf{\theta},\mathbf{z},\phi|\gamma,\delta,\epsilon,\psi) ) =
+$$
+$$
+D(p||q) = E_q\left[ p(\mathbf{\theta},\mathbf{x},\mathbf{z},\phi,\mathbf{w}, \mathbf{c} |\alpha,\beta,\lambda) \right] - E_q \left[ q(\mathbf{\theta},\mathbf{z},\phi|\gamma,\delta,\epsilon,\psi) \right]
+$$
+
+We can add the logs to get an inequality by Jensen's
+$$
+D(p||q) \leq E_q\left[\log( p(\mathbf{\theta},\mathbf{x},\mathbf{z},\phi,\mathbf{w},\mathbf{c} |\alpha,\beta,\lambda) )\right] - H_q\left[ \log(q(\mathbf{\theta},\mathbf{z},\phi|\gamma,\delta,\epsilon,\psi)) \right]
+$$
+
+$$
+\Lambda(\gamma,\delta,\epsilon,\psi; \alpha,\beta,\lambda)  = E_q\left[\log( p(\mathbf{\theta},\mathbf{x},\mathbf{z},\phi ,\mathbf{w}, \mathbf{c}| \alpha,\beta,\lambda) )\right] - H_q\left[ \log(q(\mathbf{\theta},\mathbf{z},\mathbf{x},\phi|\gamma,\delta,\epsilon,\psi)) \right] 
+$$
+We can now factorize $p$ and $q$ according to the graphical model
+$$
+\Lambda(\gamma,\delta,\epsilon,\psi; \alpha,\beta,\lambda) = E_q\left[\log( p(\mathbf{\theta}|\alpha) p(\mathbf{w}|\mathbf{z},\mathbf{x},\mathbf{c},\mathbf{\phi}) p(\mathbf{c}) p(\mathbf{x}|\lambda) p(\mathbf{z}|\theta) p(\phi |\beta,\lambda )\right] - H_q\left[ \log(q(\mathbf{\theta}|\gamma) q(\mathbf{z}|\delta) q(\mathbf{x}|\epsilon) 	q(\phi|\psi)) \right] 
+$$
+\begin{multline*}
+\Lambda(\gamma,\delta,\epsilon,\psi; \alpha,\beta,\lambda)  = E_q\left[\log( p(\mathbf{\theta}|\alpha)\right] + E_q\left[ \log(p(\mathbf{w}|\mathbf{z},\mathbf{x},\mathbf{c},\mathbf{\phi})\right] + E_q\left[ \log(p(\mathbf{c})\right] + E_q\left[ \log(p(\mathbf{x}|\lambda))\right] \\ + E_q\left[ \log(p(\mathbf{z}|\theta))\right]  + E_q \left[ \log(p(\phi |\beta ))\right] - E_q\left[ \log(q(\mathbf{\theta}|\gamma)) \right] - E_q\left[\log(q(\mathbf{z}|\epsilon))\right] - E_q\left[ \log( q(\mathbf{x}|\delta)) \right] - \\ E_q\left[ \log(	q(\phi|\psi)) \right] 
+\end{multline*}
+Each line corresponds to an expanded term
+
+\begin{multline*}
+\Lambda(\gamma,\delta,\epsilon,\psi; \alpha,\beta,\lambda) = \log(\Gamma(\sum_{j=1}^k \alpha_j )) - \sum_{i=1}^k \log(\Gamma(\alpha_i)) + \sum_{i=1}^k (\alpha_i - 1)(\Psi(\gamma_i) - \Psi(\sum_{j=1}^k \gamma_j)) \\
++  \sum_{z_{d,i} = 1}^K \epsilon_{z_{d,i}}^{(d,i)} \psi^{(d,i)}_0 E_q\left[ \log \phi_{z_{d,i}} | \delta \right] + \sum_{z_{d,i} = 1}^K \epsilon_{z_{d,i}}^{(d,i)} \psi_1^{(d,i)} (\Psi(\delta_{z_{d,i}}) - \Psi(\sum_{z_{d,i} = 1}^K \delta_{z_{d,i}} ))  \\
++ \text{Constant} \\
++ \sum_{i=1}^{N_d} 		\Psi(\psi_{x_{d,i}}) - \Psi(\psi_0 + \psi_1) \\
+\sum_{n=1}^{N_d}\sum_{z_{d,i}=1}^K \epsilon_{d,k} (\Psi(\gamma_{d,k})- \Psi(\sum_k \gamma_k^{(d,k)} )
+\end{multline*}
+\end{document}
