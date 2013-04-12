@@ -2,7 +2,7 @@
 *.log
 *.swp
 *.DS_Store
-
+*.synctex.gz
 \.classpath
 \.project
 
