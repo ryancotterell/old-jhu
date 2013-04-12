@@ -1,0 +1,19 @@
+Ryan Cotterell, Daniel Deutsch, Dan Crankshaw
+Machine Learning Complex Domains: Assignment 3
+
+To run our programs, please first execute the command
+   
+   ./compile
+
+to compile our Java source.
+
+We have implemented the collapsed sampler that can be executed
+by running the command
+
+   ./collapsed-sampler
+
+followed by all of the required arguments as defined by the project
+description. The blocked sampler can be run in a similar
+manner with the command
+
+   ./blocked-sampler
