@@ -10,20 +10,23 @@ import java.util.Set;
 
 public class Document implements Iterable<String>
 {
+	/**
+	 * This is static because the vocabulary is shared among all documents.
+	 */
 	public static Map<String, Integer> vocabulary = new HashMap<String, Integer>();
-	private static int wordCounter = 0;
-	private static Set<Integer> corpora = new HashSet<Integer>();
+	//
+	private static int vocabularySize = 0;
+	// All corpu
+	//private static Set<Integer> corpora = new HashSet<Integer>();
 	
 	private int corpus;
-	private List<String> words = new ArrayList<String>();
+	private List<String> words; // = new ArrayList<String>();
 	
 	public Document(String line)
 	{
+		words = new ArrayList<String>();
 		String[] split = line.split(" ");
 		this.corpus = Integer.parseInt(split[0]);
-		
-		if (!Document.corpora.contains(this.corpus))
-			Document.corpora.add(this.corpus);
 		
 		for (int i = 1; i < split.length; i++)
 		{
@@ -31,7 +34,7 @@ public class Document implements Iterable<String>
 			
 			// add to entire vocabulary
 			if (!Document.vocabulary.keySet().contains(split[i]))
-				Document.vocabulary.put(split[i], wordCounter++);
+				Document.vocabulary.put(split[i], vocabularySize++);
 		}
 	}
 	
@@ -53,10 +56,5 @@ public class Document implements Iterable<String>
 	public Iterator<String> iterator()
 	{
 		return this.words.iterator();
-	}
-	
-	public static int getNumberOfCorpora()
-	{
-		return Document.corpora.size();
 	}
 }

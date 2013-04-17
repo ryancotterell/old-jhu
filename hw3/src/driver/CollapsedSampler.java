@@ -16,8 +16,7 @@ public class CollapsedSampler
 	
 	private static int burnIn = 1000;
 	private static int iterations = 1100;
-	// the number of topics
-	private static int K = 25;
+	
 	
 	private static int[][] n_dk;
 	private static int[][] n_kw;
@@ -28,6 +27,9 @@ public class CollapsedSampler
 	
 	private static int[][] z;
 	private static int[][] x;
+	
+	// the number of topics
+	private static int K = 25;
 	
 	// P(collection-specific)
 	private static double lambda = 0.5;
@@ -77,8 +79,8 @@ public class CollapsedSampler
 			for (int d = 0; d < trainingDocuments.size(); d++)
 			{
 				Document document = trainingDocuments.get(d);
-				int[] localZ = CollapsedSampler.z[d];
-				int[] localX = CollapsedSampler.x[d];
+				int[] localZ = CollapsedSampler.z[d]; // Z for current doc
+				int[] localX = CollapsedSampler.x[d]; // X for current doc
 				
 				int c = document.getCorpus();
 				int n_d = document.size();
