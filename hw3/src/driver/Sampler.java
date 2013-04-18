@@ -1,100 +1,100 @@
 package driver;
 
+import java.io.FileWriter;
 import java.util.*;
 
-import sun.awt.windows.ThemeReader;
 import data.*;
 
 public abstract class Sampler {
 
 	/** The list of documents used to train the parameters */
-	private DocumentCollection trainingDocuments;
+	protected DocumentCollection trainingDocuments;
 
 	/** The list of documents used to test the parameters */
-	private DocumentCollection testDocuments;
+	protected DocumentCollection testDocuments;
 
 	/**
 	 * The average value for theta computed over all iterations after burn in on
 	 * the training dataset
 	 */
-	private double[][] average_train_thetas;
+	protected double[][] average_train_thetas;
 	
 	/** The latest point estimate for theta */
-	private double[][] trainThetas;
+	protected double[][] trainThetas;
 	
 	/** The latest point estimate for theta */
-	private double[][] testThetas;
+	protected double[][] testThetas;
 
 	/**
 	 * The average value for theta computed over all iterations after burn in on
 	 * the training dataset
 	 */
-	private double[][] average_test_thetas;
+	protected double[][] average_test_thetas;
 	
 	/** Keeps track of the number of values we are averaging over */
-	int averageCount;
+	double averageCount;
 
 	/** The average value for phi_k_w computed over all iterations after burn in */
-	private double[][] average_phi_k_w;
+	protected double[][] average_phi_k_w;
 	
 	/** The latest point estimate for phi_k_w */
-	private double[][] phi_k_w;
+	protected double[][] phi_k_w;
 	
 	/**
 	 * The average value for phi_c_k_w computed over all iterations after burn
 	 * in
 	 */
-	private double[][][] average_phi_c_k_w;
+	protected double[][][] average_phi_c_k_w;
 	
 	/** The latest point estimate for phi_c_k_w */
-	private double[][][] phi_c_k_w;
+	protected double[][][] phi_c_k_w;
 
 	/** # of tokens in document d assigned to topic k for training docs */
-	private int[][] n_dk_train;
+	protected int[][] n_dk_train;
 
 	/** # of tokens in document d assigned to topic k for test docs */
-	private int[][] n_dk_test;
+	protected int[][] n_dk_test;
 
 	/**
 	 * # of tokens assigned to topic k of word type w (only computed for train
 	 * docs)
 	 */
-	private int[][] n_kw;
+	protected int[][] n_kw;
 
 	/** total # of tokens assigned to topic k (only for train docs) */
-	private int[] n_k;
+	protected int[] n_k;
 
 	/** # of tokens of word type w assigned to topic k in corpus c */
-	private int[][][] n_ckw;
+	protected int[][][] n_ckw;
 
 	/** total # of tokens assigned to topic k in corpus c */
-	private int[][] n_ck;
+	protected int[][] n_ck;
 
 	/** current sampled values for z on training data */
-	private int[][] z_train;
+	protected int[][] z_train;
 
 	/** current sampled values for x on training data */
-	private int[][] x_train;
+	protected int[][] x_train;
 
 	/** current sampled values for z on test data */
-	private int[][] z_test;
+	protected int[][] z_test;
 
 	/** current sampled values for x on test data */
-	private int[][] x_test;
+	protected int[][] x_test;
 
 	/** The total number of topics, K */
-	private int numTopics;
+	protected int numTopics;
 
 	/** Probability of whether to look at corpus specific counts */
-	private int lambda;
+	protected double lambda;
 
 	/** Hyperparameter */
-	private int alpha;
+	protected double alpha;
 
 	/** Hyperparameter */
-	private int beta;
+	protected double beta;
 
-	public Sampler(int l, int a, int b, int topics, DocumentCollection train,
+	public Sampler(double l, double a, double b, int topics, DocumentCollection train,
 			DocumentCollection test) {
 		lambda = l;
 		alpha = a;
@@ -105,6 +105,9 @@ public abstract class Sampler {
 		initializeParameters();
 		average_train_thetas = new double[trainingDocuments.size()][numTopics];
 		average_test_thetas = new double[testDocuments.size()][numTopics];
+		int vocabSize = Document.vocabulary.size();
+		average_phi_k_w = new double[numTopics][vocabSize];
+		average_phi_c_k_w = new double[trainingDocuments.getNumberOfCorpora()][numTopics][vocabSize];
 	}
 
 	/**
@@ -188,9 +191,9 @@ public abstract class Sampler {
 		}
 		int testDocNum = 0;
 		for (Document doc : testDocuments) {
-			x_train[testDocNum] = new int[doc.size()];
+			x_test[testDocNum] = new int[doc.size()];
 			for (int i = 0; i < doc.size(); ++i) {
-				x_train[testDocNum][i] = rand.nextInt(2);
+				x_test[testDocNum][i] = rand.nextInt(2);
 			}
 			++testDocNum;
 		}
@@ -212,8 +215,9 @@ public abstract class Sampler {
 		updateThetas(burnIn);
 		updatePhi_k_w(burnIn);
 		updatePhi_c_k_w(burnIn);
-		averageCount += 1;
-		
+		if (!burnIn) {
+			averageCount += 1;
+		}
 	}
 
 	/**
@@ -353,10 +357,53 @@ public abstract class Sampler {
 		}
 		phi_c_k_w = newPhi_c_k_w;
 	}
-
-	public void writeOutput(String filePrefix) {
-
+	
+	public double[][] getAverageTrainThetas() {
+		double[][] averages = new double[trainingDocuments.size()][numTopics];
+		for (int i = 0; i < trainingDocuments.size(); ++i) {
+			for (int j = 0; j < numTopics; ++j) {
+				averages[i][j] = average_train_thetas[j][j] / averageCount;
+			}
+		}
+		return averages;
+		
 	}
+	
+	public double[][] getAverageTestThetas() {
+		double[][] averages = new double[testDocuments.size()][numTopics];
+		for (int i = 0; i < trainingDocuments.size(); ++i) {
+			for (int j = 0; j < numTopics; ++j) {
+				averages[i][j] = average_test_thetas[j][j] / averageCount;
+			}
+		}
+		return averages;
+	}
+	
+	public double[][] getAveragePhi_kw() {
+		int vocabSize = Document.vocabulary.size();
+		double[][] averages = new double[numTopics][vocabSize];
+		for (int i = 0; i < numTopics; ++i) {
+			for (int j = 0; j < vocabSize; ++j) {
+				averages[i][j] = average_phi_k_w[j][j] / averageCount;
+			}
+		}
+		return averages;
+	}
+	
+	public double[][][] getAveragePhi_ckw() {
+		int vocabSize = Document.vocabulary.size();
+		double[][][] averages = new double[trainingDocuments.getNumberOfCorpora()][numTopics][vocabSize];
+		for (int c = 0; c < trainingDocuments.getNumberOfCorpora(); ++c) {
+			for (int i = 0; i < numTopics; ++i) {
+				for (int j = 0; j < vocabSize; ++j) {
+					averages[c][i][j] = average_phi_c_k_w[c][j][j] / averageCount;
+				}
+			}
+		}
+		return averages;
+	}
+
+	
 
 	/**
 	 * Computes the likelihood of the data
