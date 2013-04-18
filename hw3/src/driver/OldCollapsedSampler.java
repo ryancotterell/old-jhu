@@ -8,7 +8,7 @@ import data.DataUtils;
 import data.Document;
 import data.Multinomial;
 
-public class BlockedSampler
+public class OldCollapsedSampler
 {
 	private static String trainingFile = "data/input-train.txt";
 	private static String testFile = "";
@@ -16,18 +16,26 @@ public class BlockedSampler
 	
 	private static int burnIn = 1000;
 	private static int iterations = 1100;
-	// the number of topics
-	private static int K = 25;
 	
+	//x
 	private static int[][] n_dk;
+	//x
 	private static int[][] n_kw;
+	//x
 	private static int[] n_k;
 	
+	//x
 	private static int[][][] n_ckw;
+	//x
 	private static int[][] n_ck;
 	
+	//x
 	private static int[][] z;
+	//x
 	private static int[][] x;
+	
+	// the number of topics
+	private static int K = 25;
 	
 	// P(collection-specific)
 	private static double lambda = 0.5;
@@ -43,9 +51,9 @@ public class BlockedSampler
 	
 	public static void main(String[] args)
 	{
-		BlockedSampler.readParameters(args);
+		OldCollapsedSampler.readParameters(args);
 		
-		List<Document> trainingDocuments = DataUtils.loadData(BlockedSampler.trainingFile);
+		List<Document> trainingDocuments = DataUtils.loadData(OldCollapsedSampler.trainingFile);
 		
 		V = Document.vocabulary.size();
 		
@@ -61,24 +69,24 @@ public class BlockedSampler
 		phi_c_k_w_samples = new double[2][K][V];
 		
 		//initialize n values 
-		n_dk = new int[trainingDocuments.size()][BlockedSampler.getNumberOfLabels()];
-		n_kw = new int[BlockedSampler.getNumberOfLabels()][Document.vocabulary.size()];
-		n_k = new int[BlockedSampler.getNumberOfLabels()];
+		n_dk = new int[trainingDocuments.size()][OldCollapsedSampler.getNumberOfLabels()];
+		n_kw = new int[OldCollapsedSampler.getNumberOfLabels()][Document.vocabulary.size()];
+		n_k = new int[OldCollapsedSampler.getNumberOfLabels()];
 		
-		n_ckw = new int[Document.getNumberOfCorpora()][BlockedSampler.getNumberOfLabels()][Document.vocabulary.size()];
-		n_ck  = new int[Document.getNumberOfCorpora()][BlockedSampler.getNumberOfLabels()];
+		n_ckw = new int[Document.getNumberOfCorpora()][OldCollapsedSampler.getNumberOfLabels()][Document.vocabulary.size()];
+		n_ck  = new int[Document.getNumberOfCorpora()][OldCollapsedSampler.getNumberOfLabels()];
 		
 		DataUtils.intialize(trainingDocuments, n_dk,n_kw,n_k,n_ckw,n_ck,z,x);
 		
 		// start sampling
-		for (int t = 0; t < BlockedSampler.iterations; t++)
+		for (int t = 0; t < OldCollapsedSampler.iterations; t++)
 		{
 			// for each token (d,i)
 			for (int d = 0; d < trainingDocuments.size(); d++)
 			{
 				Document document = trainingDocuments.get(d);
-				int[] localZ = BlockedSampler.z[d];
-				int[] localX = BlockedSampler.x[d];
+				int[] localZ = OldCollapsedSampler.z[d]; // Z for current doc
+				int[] localX = OldCollapsedSampler.x[d]; // X for current doc
 				
 				int c = document.getCorpus();
 				int n_d = document.size();
@@ -102,10 +110,9 @@ public class BlockedSampler
 					}
 						
 					// randomly sample a new value for z_d,i
-					int[] samples = sample(d,i,w,c,n_d);
-					localZ[i] = samples[0];
-					localX[i] = samples[1];
-					
+					localZ[i] = sampleZ(d,i,w,c,n_d);
+					localX[i] = sampleX(w,c,k);
+
 					// update the counts to include the newly sampled assignments of the current token
 					k = localZ[i];
 					
@@ -122,19 +129,19 @@ public class BlockedSampler
 				}
 			}
 			// estimate the parameters
-			double[][] theta = BlockedSampler.calculateTheta(t,trainingDocuments);
-			double[][] phi_k_w = BlockedSampler.calculatePhi_k_w(t);
-			double[][][] phi_c_k_w = BlockedSampler.calculatePhi_c_k_w(t);
+			double[][] theta = OldCollapsedSampler.calculateTheta(t,trainingDocuments);
+			double[][] phi_k_w = OldCollapsedSampler.calculatePhi_k_w(t);
+			double[][][] phi_c_k_w = OldCollapsedSampler.calculatePhi_c_k_w(t);
 		
 			
 			if (t > burnIn) {
 				
 			}
 			// compute the log-likelihood
-			System.out.println("Likelihood: " + BlockedSampler.computeLikelihood(trainingDocuments, theta, phi_k_w, phi_c_k_w));
+			System.out.println("Likelihood: " + OldCollapsedSampler.computeLikelihood(trainingDocuments, theta, phi_k_w, phi_c_k_w));
 	}
 		
-		BlockedSampler.extractTopcis();
+		OldCollapsedSampler.extractTopcis();
 		
 	}
 	
@@ -147,12 +154,12 @@ public class BlockedSampler
 			for (int i = 0; i < currentDocument.size(); ++i)
 			{
 				double logSum = 0;
-				for (int k = 0; k < BlockedSampler.K; ++k)
+				for (int k = 0; k < OldCollapsedSampler.K; ++k)
 				{
 					int vocabIndex = Document.vocabulary.get(currentDocument.getWord(i));
 					logSum += theta[d][k]*(
-							(1-BlockedSampler.lambda)*phi_k_w[k][vocabIndex]
-							+ BlockedSampler.lambda*phi_c_k_w[currentDocument.getCorpus()][k][vocabIndex] );
+							(1-OldCollapsedSampler.lambda)*phi_k_w[k][vocabIndex]
+							+ OldCollapsedSampler.lambda*phi_c_k_w[currentDocument.getCorpus()][k][vocabIndex] );
 				}
 				likelihood += Math.log(logSum);
 			}
@@ -179,7 +186,7 @@ public class BlockedSampler
 				writer.write(word);
 				writer0.write(word);
 				writer1.write(word);
-				for (int k = 0; k < BlockedSampler.K; k++)
+				for (int k = 0; k < OldCollapsedSampler.K; k++)
 				{
 					writer.write(" " + phi_k_w[k][Document.vocabulary.get(word)]);
 					writer0.write(" " + phi_c_k_w[0][k][Document.vocabulary.get(word)]);
@@ -208,15 +215,15 @@ public class BlockedSampler
 	
 	private static double[][] calculatePhi_k_w(int t)
 	{
-		double[][] phi_k_w = new double[BlockedSampler.K][Document.vocabulary.size()];
+		double[][] phi_k_w = new double[OldCollapsedSampler.K][Document.vocabulary.size()];
 		
-		for (int k = 0; k < BlockedSampler.K; k++)
+		for (int k = 0; k < OldCollapsedSampler.K; k++)
 		{
 			for (int w = 0; w < Document.vocabulary.size(); w++)
 			{
 				phi_k_w[k][w] = (( n_kw[k][w] + beta) / (n_k[k] + V * beta));
 				
-				if (t > BlockedSampler.burnIn) {
+				if (t > OldCollapsedSampler.burnIn) {
 					phi_k_w_samples[k][w] += phi_k_w[k][w] / (iterations - burnIn);
 				}
 			}
@@ -227,16 +234,16 @@ public class BlockedSampler
 	
 	private static double[][][] calculatePhi_c_k_w(int t)
 	{
-		double[][][] phi_c_k_w = new double[Document.getNumberOfCorpora()][BlockedSampler.K][Document.vocabulary.size()];
+		double[][][] phi_c_k_w = new double[Document.getNumberOfCorpora()][OldCollapsedSampler.K][Document.vocabulary.size()];
 
-		for (int k = 0; k < BlockedSampler.K; k++)
+		for (int k = 0; k < OldCollapsedSampler.K; k++)
 		{
 			for (int w = 0; w < Document.vocabulary.size(); w++)
 			{
 				for (int c = 0; c < Document.getNumberOfCorpora(); c++) {
 					phi_c_k_w[c][k][w] = (( n_ckw[c][k][w] + beta) / (n_ck[c][k] + V * beta));
 					
-					if (t > BlockedSampler.burnIn) {
+					if (t > OldCollapsedSampler.burnIn) {
 						phi_c_k_w_samples[c][k][w] += phi_c_k_w[c][k][w] / (iterations - burnIn);
 					}
 				}
@@ -248,7 +255,7 @@ public class BlockedSampler
 	
 	private static double[][] calculateTheta(int t, List<Document> documents)
 	{
-		double[][] theta = new double[documents.size()][BlockedSampler.K];
+		double[][] theta = new double[documents.size()][OldCollapsedSampler.K];
 
 		for (int d = 0; d < documents.size(); d++)
 		{
@@ -256,9 +263,9 @@ public class BlockedSampler
 		
 			int n_d = document.size();
 			
-			for (int k = 0; k < BlockedSampler.K; k++) {
-				theta[d][k] = (n_dk[d][k] + BlockedSampler.alpha) / (n_d + BlockedSampler.K * BlockedSampler.alpha);
-				if (t > BlockedSampler.burnIn) {
+			for (int k = 0; k < OldCollapsedSampler.K; k++) {
+				theta[d][k] = (n_dk[d][k] + OldCollapsedSampler.alpha) / (n_d + OldCollapsedSampler.K * OldCollapsedSampler.alpha);
+				if (t > OldCollapsedSampler.burnIn) {
 					theta_samples[d][k] += theta[d][k] / (iterations - burnIn);
 				}
 			}
@@ -267,63 +274,60 @@ public class BlockedSampler
 		return theta;
 	}
 	
-	
-	private static int[] sample(int d, int i,int w, int c, int n_d)
+	private static int sampleZ(int d, int i,int w, int c, int n_d)
 	{
 		
-		
 		int V = Document.vocabulary.size();
-		double[] probabilities = new double[BlockedSampler.K * 2];
+		double[] probabilities = new double[OldCollapsedSampler.K];
 		
 		
-		for (int k = 0; k < BlockedSampler.K * 2; k++)
+		for (int k = 0; k < OldCollapsedSampler.K; k++)
 		{
 			
-			if (k < BlockedSampler.K) {
-				probabilities[k] = (1 - lambda) * ((n_dk[d][k] + alpha) / (n_d + K * alpha)) * ((n_kw[k][w]  + beta) / ( n_k[k] + V * beta));
+			if (x[d][i] == 0) {
+				probabilities[k] = ((n_dk[d][k] + alpha) / (n_d + K * alpha)) * ((n_kw[k][w]  + beta) / ( n_k[k] + V * beta));
 			} else {
-				int k_tmp = k - BlockedSampler.K;
-				probabilities[k] = (lambda) * ((n_dk[d][k_tmp] + alpha) / (n_d + K * alpha)) * ((n_ckw[c][k_tmp][w] + beta) / (n_ck[c][k_tmp] + V * beta));
+				probabilities[k] = ((n_dk[d][k] + alpha) / (n_d + K * alpha)) * ((n_ckw[c][k][w] + beta) / (n_ck[c][k] + V * beta));
 			}
 
 		}
 		
 		Multinomial mult = new Multinomial(probabilities);
-		int sample =  mult.sample();
+		return mult.sample();
+	}
+	
+	// TODO this is wrong. We should be using the new value for z_di, not k
+	private static int sampleX(int w, int c, int k)
+	{
+		int V = Document.vocabulary.size();
+
+		double[] probabilities = new double[2];
 		
-		int z;
-		int x;
-		if (sample >= BlockedSampler.K) {
-			z = sample - BlockedSampler.K;
-			x = 1;
-		} else {
-			z = sample;
-			x = 0;
-		}
-		
-		int[] samples = {z,x};
-		
-		return samples;
+		probabilities[0] = (1 - OldCollapsedSampler.lambda) * ((n_kw[k][w] + OldCollapsedSampler.beta) / (n_k[k] + V * beta));
+		probabilities[1] = OldCollapsedSampler.lambda * (( n_ckw[c][k][w] ) / (n_ck[c][k] + V * beta));
+
+		Multinomial mult = new Multinomial(probabilities);
+		return mult.sample();
 	}
 	
 	public static int getNumberOfLabels()
 	{
-		return BlockedSampler.K;
+		return OldCollapsedSampler.K;
 	}
 	
 	private static void readParameters(String[] args)
 	{
 		if (args.length == 9)
 		{
-			BlockedSampler.trainingFile = args[0];
-			BlockedSampler.testFile = args[1];
-			BlockedSampler.outputFile = args[2];
-			BlockedSampler.K = Integer.parseInt(args[3]);
-			BlockedSampler.lambda = Double.parseDouble(args[4]);
-			BlockedSampler.alpha = Double.parseDouble(args[5]);
-			BlockedSampler.beta = Double.parseDouble(args[6]);
-			BlockedSampler.iterations = Integer.parseInt(args[7]);
-			BlockedSampler.burnIn = Integer.parseInt(args[8]);
+			OldCollapsedSampler.trainingFile = args[0];
+			OldCollapsedSampler.testFile = args[1];
+			OldCollapsedSampler.outputFile = args[2];
+			OldCollapsedSampler.K = Integer.parseInt(args[3]);
+			OldCollapsedSampler.lambda = Double.parseDouble(args[4]);
+			OldCollapsedSampler.alpha = Double.parseDouble(args[5]);
+			OldCollapsedSampler.beta = Double.parseDouble(args[6]);
+			OldCollapsedSampler.iterations = Integer.parseInt(args[7]);
+			OldCollapsedSampler.burnIn = Integer.parseInt(args[8]);
 		}
 	}
 }
