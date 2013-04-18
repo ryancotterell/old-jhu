@@ -22,6 +22,7 @@ public class Driver {
 	private static double beta;
 	private static int iterations;
 	private static int burnIn;
+        private static boolean collapsedSampler;
 	
 
 	/**
@@ -31,7 +32,12 @@ public class Driver {
 		parseCommandLineArgs(args);
 		DocumentCollection trainingDocs = loadData(trainingFile);
 		DocumentCollection testDocs = loadData(testFile);
-		Sampler sampler = new CollapsedSampler(lambda, alpha, beta, numTopics, trainingDocs, testDocs);
+                Sampler sampler;
+                if (collapsedSampler) {
+                        sampler = new CollapsedSampler(lambda, alpha, beta, numTopics, trainingDocs, testDocs);
+                } else {
+                        sampler = new BlockedSampler(lambda, alpha, beta, numTopics, trainingDocs, testDocs);
+                }
 		StopWatch watch = new StopWatch();
 		watch.start();
 		
@@ -70,17 +76,18 @@ public class Driver {
 	}
 	
 	private static void parseCommandLineArgs(String[] args) {
-		if (args.length == 9)
+		if (args.length == 10)
 		{
-			trainingFile = args[0];
-			testFile = args[1];
-			outputFile = args[2];
+                        collapsedSampler = Boolean.parseBoolean(args[0]);
+			trainingFile = args[1];
+			testFile = args[2];
+			outputFile = args[3];
 			numTopics = Integer.parseInt(args[3]);
-			lambda = Double.parseDouble(args[4]);
-			alpha = Double.parseDouble(args[5]);
-			beta = Double.parseDouble(args[6]);
-			iterations = Integer.parseInt(args[7]);
-			burnIn = Integer.parseInt(args[8]);
+			lambda = Double.parseDouble(args[5]);
+			alpha = Double.parseDouble(args[6]);
+			beta = Double.parseDouble(args[7]);
+			iterations = Integer.parseInt(args[8]);
+			burnIn = Integer.parseInt(args[9]);
 		}
 	}
 	
