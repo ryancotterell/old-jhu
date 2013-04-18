@@ -78,11 +78,11 @@ public class Driver {
 	private static void parseCommandLineArgs(String[] args) {
 		if (args.length == 10)
 		{
-                        collapsedSampler = Boolean.parseBoolean(args[0]);
+             collapsedSampler = Boolean.parseBoolean(args[0]);
 			trainingFile = args[1];
 			testFile = args[2];
 			outputFile = args[3];
-			numTopics = Integer.parseInt(args[3]);
+			numTopics = Integer.parseInt(args[4]);
 			lambda = Double.parseDouble(args[5]);
 			alpha = Double.parseDouble(args[6]);
 			beta = Double.parseDouble(args[7]);
