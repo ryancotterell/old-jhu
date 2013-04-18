@@ -7,11 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class DocumentCollection implements Iterable<Document>
+public class DocumentCollection// implements Iterable<Document>
 {
 
 	/** All documents in this set */
-	private List<Document> documents;
+	private ArrayList<Document> documents;
 	
 	// TODO should this be static/shared across training/test? It won't matter in practice
 	/** A set of all the corpus numbers in this DocumentSet.*/

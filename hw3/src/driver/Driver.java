@@ -9,12 +9,13 @@ import java.util.Scanner;
 
 import data.Document;
 import data.DocumentCollection;
+import util.StopWatch;
 
 public class Driver {
 	
-	private static String trainingFile = "";
-	private static String testFile = "";
-	private static String outputFile = "";
+	private static String trainingFile;
+	private static String testFile;
+	private static String outputFile;
 	private static int numTopics;
 	private static double lambda;
 	private static double alpha;
@@ -31,20 +32,31 @@ public class Driver {
 		DocumentCollection trainingDocs = loadData(trainingFile);
 		DocumentCollection testDocs = loadData(testFile);
 		Sampler sampler = new CollapsedSampler(lambda, alpha, beta, numTopics, trainingDocs, testDocs);
+		StopWatch watch = new StopWatch();
+		watch.start();
+		
 		
 		for (int i = 0; i < burnIn; ++i) {
 			sampler.runIteration(true);
 			double trainLikelihood = sampler.computeLikelihood(true);
 			double testLikelihood = sampler.computeLikelihood(false);
+			if (i % 50 == 0) {
+				System.out.printf("iter: %d \t\t train: %f \t\t test: %f\n", i, trainLikelihood, testLikelihood);
+			}
 		}
 		
 		double[] trainLLs = new double[iterations - burnIn];
 		double[] testLLs = new double[iterations - burnIn];
 		for (int i = 0; i < iterations - burnIn; ++i) {
 			sampler.runIteration(false);
-			trainLLs[i] = sampler.computeLikelihood(true);
-			testLLs[i] = sampler.computeLikelihood(false);
+			double trainLikelihood = sampler.computeLikelihood(true);
+			double testLikelihood = sampler.computeLikelihood(false);
+			trainLLs[i] = trainLikelihood;
+			testLLs[i] = testLikelihood;
+			System.out.printf("iter: %d \t\t train: %f \t\t test: %f\n", i, trainLikelihood, testLikelihood);
 		}
+		watch.stop();
+		System.out.println("Duration: " + watch.getTime()/1000.0);
 		
 		writeOutput(outputFile, trainLLs, testLLs, sampler);
 		

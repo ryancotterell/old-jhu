@@ -34,42 +34,42 @@ public class DataUtils {
 			int[][] x) {
 		Random random = new Random();
 
-		for (int d = 0; d < documents.size(); d++) {
-			Document document = documents.get(d);
-			x[d] = new int[document.size()];
-
-			for (int i = 0; i < document.size(); i++) {
-				x[d][i] = random.nextInt(2);
-			}
-
-		}
-
-		for (int d = 0; d < documents.size(); d++) {
-			Document document = documents.get(d);
-			z[d] = new int[document.size()];
-
-			for (int i = 0; i < document.size(); i++) {
-				int k = random.nextInt(OldCollapsedSampler.getNumberOfLabels());
-
-				int c = document.getCorpus();
-
-				String word = document.getWord(i);
-				int w = Document.vocabulary.get(word);
-
-				n_dk[d][k] += 1;
-
-				if (x[d][i] == 0) {
-					n_kw[k][w] += 1;
-					n_k[k] += 1;
-				} else {
-
-					n_ckw[c][k][w] += 1;
-					n_ck[c][k] += 1;
-				}
-				z[d][i] = k;
-
-			}
-
-		}
+//		for (int d = 0; d < documents.size(); d++) {
+//			Document document = documents.get(d);
+//			x[d] = new int[document.size()];
+//
+//			for (int i = 0; i < document.size(); i++) {
+//				x[d][i] = random.nextInt(2);
+//			}
+//
+//		}
+//
+//		for (int d = 0; d < documents.size(); d++) {
+//			Document document = documents.get(d);
+//			z[d] = new int[document.size()];
+//
+//			for (int i = 0; i < document.size(); i++) {
+//				int k = random.nextInt(OldCollapsedSampler.getNumberOfLabels());
+//
+//				int c = document.getCorpus();
+//
+//				String word = document.getWord(i);
+//				int w = Document.vocabulary.get(word);
+//
+//				n_dk[d][k] += 1;
+//
+//				if (x[d][i] == 0) {
+//					n_kw[k][w] += 1;
+//					n_k[k] += 1;
+//				} else {
+//
+//					n_ckw[c][k][w] += 1;
+//					n_ck[c][k] += 1;
+//				}
+//				z[d][i] = k;
+//
+//			}
+//
+//		}
 	}
 }

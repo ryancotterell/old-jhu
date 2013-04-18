@@ -43,102 +43,102 @@ public class OldBlockedSampler
 	
 	public static void main(String[] args)
 	{
-		OldBlockedSampler.readParameters(args);
-		
-		List<Document> trainingDocuments = DataUtils.loadData(OldBlockedSampler.trainingFile);
-		
-		V = Document.vocabulary.size();
-		
-		// initialize variables
-		
-		//initialize z and x
-		z = new int[trainingDocuments.size()][0];
-		x = new int[trainingDocuments.size()][0];
-		
-		//initial sample bins
-		theta_samples = new double[V][K];
-		phi_k_w_samples = new double[K][V]; 
-		phi_c_k_w_samples = new double[2][K][V];
-		
-		//initialize n values 
-		n_dk = new int[trainingDocuments.size()][OldBlockedSampler.getNumberOfLabels()];
-		n_kw = new int[OldBlockedSampler.getNumberOfLabels()][Document.vocabulary.size()];
-		n_k = new int[OldBlockedSampler.getNumberOfLabels()];
-		
-		n_ckw = new int[Document.getNumberOfCorpora()][OldBlockedSampler.getNumberOfLabels()][Document.vocabulary.size()];
-		n_ck  = new int[Document.getNumberOfCorpora()][OldBlockedSampler.getNumberOfLabels()];
-		
-		DataUtils.intialize(trainingDocuments, n_dk,n_kw,n_k,n_ckw,n_ck,z,x);
-		
-		// start sampling
-		for (int t = 0; t < OldBlockedSampler.iterations; t++)
-		{
-			// for each token (d,i)
-			for (int d = 0; d < trainingDocuments.size(); d++)
-			{
-				Document document = trainingDocuments.get(d);
-				int[] localZ = OldBlockedSampler.z[d];
-				int[] localX = OldBlockedSampler.x[d];
-				
-				int c = document.getCorpus();
-				int n_d = document.size();
-				
-				for (int i = 0; i < document.size(); i++)
-				{
-					String word = document.getWord(i);
-					// update the counts to exclude the assignments of the current token
-					int k = localZ[i];
-					
-					int w = Document.vocabulary.get(word);
-					
-					n_dk[d][k] -= 1;
-					
-					if (localX[i] == 0) {
-						n_k[k] -= 1;
-						n_kw[k][w] -= 1;
-					} else {
-						n_ckw[c][k][w] -= 1;
-						n_ck[c][k] -= 1;
-					}
-						
-					// randomly sample a new value for z_d,i
-					/* Start of change */
-					// d = docNum, i = wordNum, w = vocab word num, c = corpusNum, n_d = documentSize
-					int[] samples = sample(d,i,w,c,n_d);
-					localZ[i] = samples[0];
-					localX[i] = samples[1];
-					/* End of change */
-					
-					// update the counts to include the newly sampled assignments of the current token
-					k = localZ[i];
-					
-					n_dk[d][k] += 1;
-					
-					if (localX[i] == 0) {
-						n_k[k] += 1;
-						n_kw[k][w] += 1;
-					} else {
-						n_ckw[c][k][w] += 1;
-						n_ck[c][k] += 1;
-					}
-					
-				}
-			}
-			// estimate the parameters
-			double[][] theta = OldBlockedSampler.calculateTheta(t,trainingDocuments);
-			double[][] phi_k_w = OldBlockedSampler.calculatePhi_k_w(t);
-			double[][][] phi_c_k_w = OldBlockedSampler.calculatePhi_c_k_w(t);
-		
-			
-			if (t > burnIn) {
-				
-			}
-			// compute the log-likelihood
-			System.out.println("Likelihood: " + OldBlockedSampler.computeLikelihood(trainingDocuments, theta, phi_k_w, phi_c_k_w));
-	}
-		
-		OldBlockedSampler.extractTopcis();
-		
+//		OldBlockedSampler.readParameters(args);
+//		
+//		List<Document> trainingDocuments = DataUtils.loadData(OldBlockedSampler.trainingFile);
+//		
+//		V = Document.vocabulary.size();
+//		
+//		// initialize variables
+//		
+//		//initialize z and x
+//		z = new int[trainingDocuments.size()][0];
+//		x = new int[trainingDocuments.size()][0];
+//		
+//		//initial sample bins
+//		theta_samples = new double[V][K];
+//		phi_k_w_samples = new double[K][V]; 
+//		phi_c_k_w_samples = new double[2][K][V];
+//		
+//		//initialize n values 
+//		n_dk = new int[trainingDocuments.size()][OldBlockedSampler.getNumberOfLabels()];
+//		n_kw = new int[OldBlockedSampler.getNumberOfLabels()][Document.vocabulary.size()];
+//		n_k = new int[OldBlockedSampler.getNumberOfLabels()];
+//		
+//		n_ckw = new int[Document.getNumberOfCorpora()][OldBlockedSampler.getNumberOfLabels()][Document.vocabulary.size()];
+//		n_ck  = new int[Document.getNumberOfCorpora()][OldBlockedSampler.getNumberOfLabels()];
+//		
+//		DataUtils.intialize(trainingDocuments, n_dk,n_kw,n_k,n_ckw,n_ck,z,x);
+//		
+//		// start sampling
+//		for (int t = 0; t < OldBlockedSampler.iterations; t++)
+//		{
+//			// for each token (d,i)
+//			for (int d = 0; d < trainingDocuments.size(); d++)
+//			{
+//				Document document = trainingDocuments.get(d);
+//				int[] localZ = OldBlockedSampler.z[d];
+//				int[] localX = OldBlockedSampler.x[d];
+//				
+//				int c = document.getCorpus();
+//				int n_d = document.size();
+//				
+//				for (int i = 0; i < document.size(); i++)
+//				{
+//					String word = document.getWord(i);
+//					// update the counts to exclude the assignments of the current token
+//					int k = localZ[i];
+//					
+//					int w = Document.vocabulary.get(word);
+//					
+//					n_dk[d][k] -= 1;
+//					
+//					if (localX[i] == 0) {
+//						n_k[k] -= 1;
+//						n_kw[k][w] -= 1;
+//					} else {
+//						n_ckw[c][k][w] -= 1;
+//						n_ck[c][k] -= 1;
+//					}
+//						
+//					// randomly sample a new value for z_d,i
+//					/* Start of change */
+//					// d = docNum, i = wordNum, w = vocab word num, c = corpusNum, n_d = documentSize
+//					int[] samples = sample(d,i,w,c,n_d);
+//					localZ[i] = samples[0];
+//					localX[i] = samples[1];
+//					/* End of change */
+//					
+//					// update the counts to include the newly sampled assignments of the current token
+//					k = localZ[i];
+//					
+//					n_dk[d][k] += 1;
+//					
+//					if (localX[i] == 0) {
+//						n_k[k] += 1;
+//						n_kw[k][w] += 1;
+//					} else {
+//						n_ckw[c][k][w] += 1;
+//						n_ck[c][k] += 1;
+//					}
+//					
+//				}
+//			}
+//			// estimate the parameters
+//			double[][] theta = OldBlockedSampler.calculateTheta(t,trainingDocuments);
+//			double[][] phi_k_w = OldBlockedSampler.calculatePhi_k_w(t);
+//			double[][][] phi_c_k_w = OldBlockedSampler.calculatePhi_c_k_w(t);
+//		
+//			
+//			if (t > burnIn) {
+//				
+//			}
+//			// compute the log-likelihood
+//			System.out.println("Likelihood: " + OldBlockedSampler.computeLikelihood(trainingDocuments, theta, phi_k_w, phi_c_k_w));
+//	}
+//		
+//		OldBlockedSampler.extractTopcis();
+//		
 	}
 	
 	private static double computeLikelihood(List<Document> documents, double[][] theta, double[][] phi_k_w, double[][][] phi_c_k_w)
@@ -228,26 +228,26 @@ public class OldBlockedSampler
 		return phi_k_w;
 	}
 	
-	private static double[][][] calculatePhi_c_k_w(int t)
-	{
-		double[][][] phi_c_k_w = new double[Document.getNumberOfCorpora()][OldBlockedSampler.K][Document.vocabulary.size()];
-
-		for (int k = 0; k < OldBlockedSampler.K; k++)
-		{
-			for (int w = 0; w < Document.vocabulary.size(); w++)
-			{
-				for (int c = 0; c < Document.getNumberOfCorpora(); c++) {
-					phi_c_k_w[c][k][w] = (( n_ckw[c][k][w] + beta) / (n_ck[c][k] + V * beta));
-					
-					if (t > OldBlockedSampler.burnIn) {
-						phi_c_k_w_samples[c][k][w] += phi_c_k_w[c][k][w] / (iterations - burnIn);
-					}
-				}
-			}
-		}
-		
-		return phi_c_k_w;
-	}
+//	private static double[][][] calculatePhi_c_k_w(int t)
+//	{
+//		double[][][] phi_c_k_w = new double[Document.getNumberOfCorpora()][OldBlockedSampler.K][Document.vocabulary.size()];
+//
+//		for (int k = 0; k < OldBlockedSampler.K; k++)
+//		{
+//			for (int w = 0; w < Document.vocabulary.size(); w++)
+//			{
+//				for (int c = 0; c < Document.getNumberOfCorpora(); c++) {
+//					phi_c_k_w[c][k][w] = (( n_ckw[c][k][w] + beta) / (n_ck[c][k] + V * beta));
+//					
+//					if (t > OldBlockedSampler.burnIn) {
+//						phi_c_k_w_samples[c][k][w] += phi_c_k_w[c][k][w] / (iterations - burnIn);
+//					}
+//				}
+//			}
+//		}
+//		
+//		return phi_c_k_w;
+//	}
 	
 	private static double[][] calculateTheta(int t, List<Document> documents)
 	{

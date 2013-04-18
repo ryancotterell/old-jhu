@@ -134,8 +134,8 @@ public abstract class Sampler {
 				.size()];
 		n_ck = new int[trainingDocuments.getNumberOfCorpora()][numTopics];
 
-		int docNum = 0;
-		for (Document doc : trainingDocuments) {
+		for (int docNum = 0; docNum < trainingDocuments.size(); ++docNum) {
+			Document doc = trainingDocuments.getDocument(docNum);
 			z_train[docNum] = new int[doc.size()];
 			for (int i = 0; i < doc.size(); ++i) {
 				int k = rand.nextInt(numTopics);
@@ -166,8 +166,10 @@ public abstract class Sampler {
 		z_test = new int[testDocuments.getNumberOfDocuments()][];
 		n_dk_test = new int[testDocuments.getNumberOfDocuments()][numTopics];
 
-		int docNum = 0;
-		for (Document doc : testDocuments) {
+		//int docNum = 0;
+		for (int docNum = 0; docNum < testDocuments.size(); ++docNum) {
+		//for (Document doc : testDocuments) {
+			Document doc = testDocuments.getDocument(docNum);
 			z_test[docNum] = new int[doc.size()];
 			for (int i = 0; i < doc.size(); ++i) {
 				int k = rand.nextInt(numTopics);
@@ -181,21 +183,21 @@ public abstract class Sampler {
 		Random rand = new Random();
 		x_train = new int[trainingDocuments.getNumberOfDocuments()][];
 		x_test = new int[testDocuments.getNumberOfDocuments()][];
-		int trainDocNum = 0;
-		for (Document doc : trainingDocuments) {
+		for (int trainDocNum = 0; trainDocNum < trainingDocuments.getNumberOfDocuments(); ++ trainDocNum) {
+			Document doc = trainingDocuments.getDocument(trainDocNum);
 			x_train[trainDocNum] = new int[doc.size()];
 			for (int i = 0; i < doc.size(); ++i) {
 				x_train[trainDocNum][i] = rand.nextInt(2);
 			}
-			++trainDocNum;
 		}
-		int testDocNum = 0;
-		for (Document doc : testDocuments) {
+		//int testDocNum = 0;
+		//for (Document doc : testDocuments) {
+		for (int testDocNum = 0; testDocNum < testDocuments.getNumberOfDocuments(); ++testDocNum) {
+			Document doc = testDocuments.getDocument(testDocNum);
 			x_test[testDocNum] = new int[doc.size()];
 			for (int i = 0; i < doc.size(); ++i) {
 				x_test[testDocNum][i] = rand.nextInt(2);
 			}
-			++testDocNum;
 		}
 	}
 	
@@ -264,12 +266,12 @@ public abstract class Sampler {
 	
 	private void sampleTestDocument(int docNum) {
 		Document doc = testDocuments.getDocument(docNum);
-		int[] currentDocZs = z_train[docNum];
-		int[] currentDocXs = x_train[docNum];
+		int[] currentDocZs = z_test[docNum];
+		int[] currentDocXs = x_test[docNum];
 		
 		int c = doc.getCorpus();
-		
-		for (int i = 0; i < doc.size(); ++i) {
+		int docSize = doc.size();
+		for (int i = 0; i < docSize; ++i) {
 			String word = doc.getWord(i);
 			int k = currentDocZs[i];
 			int w = Document.vocabulary.get(word);
@@ -279,7 +281,7 @@ public abstract class Sampler {
 			
 			testingSample(doc, docNum, i, c, currentDocZs, currentDocXs);
 			k = currentDocZs[i];
-			n_dk_train[docNum][k] += 1;
+			n_dk_test[docNum][k] += 1;
 		}
 	}
 
@@ -346,8 +348,8 @@ public abstract class Sampler {
 		int vocabSize = Document.vocabulary.size();
 		double[][][] newPhi_c_k_w = new double[trainingDocuments.getNumberOfCorpora()][numTopics][vocabSize];
 		for (int k = 0; k < numTopics; ++k) {
-			for (int w = 0; w < vocabSize; ++k) {
-				for (int c = 0; c < trainingDocuments.getNumberOfCorpora(); ++k) {
+			for (int w = 0; w < vocabSize; ++w) {
+				for (int c = 0; c < trainingDocuments.getNumberOfCorpora(); ++c) {
 					newPhi_c_k_w[c][k][w] = (( n_ckw[c][k][w] + beta) / (n_ck[c][k] + vocabSize * beta));
 					if (!burnIn) {
 						average_phi_c_k_w[c][k][w] += newPhi_c_k_w[c][k][w];
@@ -362,7 +364,7 @@ public abstract class Sampler {
 		double[][] averages = new double[trainingDocuments.size()][numTopics];
 		for (int i = 0; i < trainingDocuments.size(); ++i) {
 			for (int j = 0; j < numTopics; ++j) {
-				averages[i][j] = average_train_thetas[j][j] / averageCount;
+				averages[i][j] = average_train_thetas[i][j] / averageCount;
 			}
 		}
 		return averages;
@@ -371,9 +373,9 @@ public abstract class Sampler {
 	
 	public double[][] getAverageTestThetas() {
 		double[][] averages = new double[testDocuments.size()][numTopics];
-		for (int i = 0; i < trainingDocuments.size(); ++i) {
+		for (int i = 0; i < testDocuments.size(); ++i) {
 			for (int j = 0; j < numTopics; ++j) {
-				averages[i][j] = average_test_thetas[j][j] / averageCount;
+				averages[i][j] = average_test_thetas[i][j] / averageCount;
 			}
 		}
 		return averages;
@@ -384,7 +386,7 @@ public abstract class Sampler {
 		double[][] averages = new double[numTopics][vocabSize];
 		for (int i = 0; i < numTopics; ++i) {
 			for (int j = 0; j < vocabSize; ++j) {
-				averages[i][j] = average_phi_k_w[j][j] / averageCount;
+				averages[i][j] = average_phi_k_w[i][j] / averageCount;
 			}
 		}
 		return averages;
@@ -396,7 +398,7 @@ public abstract class Sampler {
 		for (int c = 0; c < trainingDocuments.getNumberOfCorpora(); ++c) {
 			for (int i = 0; i < numTopics; ++i) {
 				for (int j = 0; j < vocabSize; ++j) {
-					averages[c][i][j] = average_phi_c_k_w[c][j][j] / averageCount;
+					averages[c][i][j] = average_phi_c_k_w[c][i][j] / averageCount;
 				}
 			}
 		}
