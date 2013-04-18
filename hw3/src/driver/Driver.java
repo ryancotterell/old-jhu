@@ -102,6 +102,7 @@ public class Driver {
 	 */
 	// TODO get 13 digits in output
 	private static void writeOutput(String filePrefix, double[] trainlls, double[] testlls, Sampler s) {
+		filePrefix += "-" + numTopics + "-" + lambda + "-" + alpha;
 		try {
 			FileWriter phi = new FileWriter(filePrefix + "-phi.txt");
 			FileWriter phi0 = new FileWriter(filePrefix + "-phi0.txt");

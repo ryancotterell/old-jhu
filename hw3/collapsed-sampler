@@ -1,1 +1,1 @@
-java -cp bin driver/CollapsedSampler $*
+java -cp bin driver/Driver $*
