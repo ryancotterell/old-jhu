@@ -103,6 +103,7 @@ public class OldBlockedSampler
 						
 					// randomly sample a new value for z_d,i
 					/* Start of change */
+					// d = docNum, i = wordNum, w = vocab word num, c = corpusNum, n_d = documentSize
 					int[] samples = sample(d,i,w,c,n_d);
 					localZ[i] = samples[0];
 					localX[i] = samples[1];
