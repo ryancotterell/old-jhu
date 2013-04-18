@@ -120,15 +120,6 @@ public class Driver {
 				testLL.write(testlls[i] + "\n");
 			}
 			
-			for (String word : Document.vocabulary.keySet()) {
-				phi.write(word);
-				phi0.write(word);
-				phi1.write(word);
-				for (int k = 0; k < numTopics; ++k) {
-					
-				}
-			}
-			
 			int vocabSize = Document.vocabulary.size();
 			
 			//write thetas
