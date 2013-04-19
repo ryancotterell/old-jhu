@@ -13,7 +13,7 @@ import data.DocumentCollection;
 import util.StopWatch;
 
 public class Driver {
-	
+
 	private static String trainingFile;
 	private static String testFile;
 	private static String outputFile;
@@ -23,8 +23,7 @@ public class Driver {
 	private static double beta;
 	private static int iterations;
 	private static int burnIn;
-        private static boolean collapsedSampler;
-	
+	private static boolean collapsedSampler;
 
 	/**
 	 * @param args
@@ -33,61 +32,43 @@ public class Driver {
 		parseCommandLineArgs(args);
 		DocumentCollection trainingDocs = loadData(trainingFile);
 		DocumentCollection testDocs = loadData(testFile);
-                Sampler sampler;
-                if (collapsedSampler) {
-                        sampler = new CollapsedSampler(lambda, alpha, beta, numTopics, trainingDocs, testDocs);
-                } else {
-                        sampler = new BlockedSampler(lambda, alpha, beta, numTopics, trainingDocs, testDocs);
-                }
-		StopWatch watch = new StopWatch();
-		watch.start();
-		
-                Date start = new Date();
-		
+		Sampler sampler;
+		if (collapsedSampler) {
+			sampler = new CollapsedSampler(lambda, alpha, beta, numTopics,
+					trainingDocs, testDocs);
+		} else {
+			sampler = new BlockedSampler(lambda, alpha, beta, numTopics,
+					trainingDocs, testDocs);
+		}
+
+		double[] trainLLs = new double[iterations];
+		double[] testLLs = new double[iterations];
 		for (int i = 0; i < burnIn; ++i) {
 			sampler.runIteration(true);
 			double trainLikelihood = sampler.computeLikelihood(true);
 			double testLikelihood = sampler.computeLikelihood(false);
-			/*if (i % 50 == 0) {
-				System.out.printf("iter: %d \t\t train: %f \t\t test: %f\n", i, trainLikelihood, testLikelihood);
-			}*/
+			trainLLs[i] = trainLikelihood;
+			testLLs[i] = testLikelihood;
 		}
-		
-		double[] trainLLs = new double[iterations - burnIn];
-		double[] testLLs = new double[iterations - burnIn];
+
+		//double[] trainLLs = new double[iterations - burnIn];
+		//double[] testLLs = new double[iterations - burnIn];
 		for (int i = 0; i < iterations - burnIn; ++i) {
 			sampler.runIteration(false);
 			double trainLikelihood = sampler.computeLikelihood(true);
 			double testLikelihood = sampler.computeLikelihood(false);
-			trainLLs[i] = trainLikelihood;
-			testLLs[i] = testLikelihood;
-                        Date current = new Date();
-                        long duration = current.getTime() - start.getTime();
-                        //System.out.printf("%d\t%f\n", duration, trainLikelihood);
-			//System.out.printf("iter: %d \t\t train: %f \t\t test: %f\n", i, trainLikelihood, testLikelihood);
-			//System.out.printf("%f\t\t%f\n", trainLikelihood, testLikelihood);
+			
 		}
-		watch.stop();
-		//System.out.println("Duration: " + watch.getTime()/1000.0);
-                
-                double likelihood = sampler.computeLikelihoodAverageParams();
-                System.out.printf("%f\t%f\n", lambda, likelihood);
-		
-		//writeOutput(outputFile, trainLLs, testLLs, sampler);
-		
-		
-		// load data
-		// create sampler
-		// run iteration
-		// compute likelihoods
-		// optional normalize likelihoods
+
+		double likelihood = sampler.computeLikelihoodAverageParams();
+
+		writeOutput(outputFile, trainLLs, testLLs, sampler);
 
 	}
-	
+
 	private static void parseCommandLineArgs(String[] args) {
-		if (args.length == 10)
-		{
-             collapsedSampler = Boolean.parseBoolean(args[0]);
+		if (args.length == 10) {
+			collapsedSampler = Boolean.parseBoolean(args[0]);
 			trainingFile = args[1];
 			testFile = args[2];
 			outputFile = args[3];
@@ -99,7 +80,7 @@ public class Driver {
 			burnIn = Integer.parseInt(args[9]);
 		}
 	}
-	
+
 	private static DocumentCollection loadData(String filename) {
 		DocumentCollection documents = new DocumentCollection();
 		try {
@@ -111,13 +92,15 @@ public class Driver {
 		}
 		return documents;
 	}
-	
+
 	/**
 	 * Writes out mean parameter values
+	 * 
 	 * @param filePrefix
 	 */
 	// TODO get 13 digits in output
-	private static void writeOutput(String filePrefix, double[] trainlls, double[] testlls, Sampler s) {
+	private static void writeOutput(String filePrefix, double[] trainlls,
+			double[] testlls, Sampler s) {
 		filePrefix += "-" + numTopics + "-" + lambda + "-" + alpha;
 		try {
 			FileWriter phi = new FileWriter(filePrefix + "-phi.txt");
@@ -130,39 +113,39 @@ public class Driver {
 			double[][] trainThetas = s.getAverageTrainThetas();
 			double[][] phiKW = s.getAveragePhi_kw();
 			double[][][] phiCKW = s.getAveragePhi_ckw();
-			
+
 			// write likelihoods
 			for (int i = 0; i < trainlls.length; ++i) {
 				trainLL.write(trainlls[i] + "\n");
 				testLL.write(testlls[i] + "\n");
 			}
-			
+
 			int vocabSize = Document.vocabulary.size();
-			
-			//write thetas
+
+			// write thetas
 			for (int d = 0; d < trainThetas.length; ++d) {
 				theta.write("" + trainThetas[d][0]);
 				for (int k = 1; k < trainThetas[0].length; ++k) {
 					theta.write(" " + trainThetas[d][k]);
 				}
 			}
-			
-			//write phis
+
+			// write phis
 			int counter = 1;
 			int size = Document.vocabulary.keySet().size();
-			for (String word : Document.vocabulary.keySet())
-			{
+			for (String word : Document.vocabulary.keySet()) {
 				phi.write(word);
 				phi0.write(word);
 				phi1.write(word);
-				for (int k = 0; k < numTopics; ++k)
-				{
+				for (int k = 0; k < numTopics; ++k) {
 					phi.write(" " + phiKW[k][Document.vocabulary.get(word)]);
-					phi0.write(" " + phiCKW[0][k][Document.vocabulary.get(word)]);
-					phi1.write(" " + phiCKW[1][k][Document.vocabulary.get(word)]);
+					phi0.write(" "
+							+ phiCKW[0][k][Document.vocabulary.get(word)]);
+					phi1.write(" "
+							+ phiCKW[1][k][Document.vocabulary.get(word)]);
 
 				}
-				
+
 				if (size != counter) {
 					phi.write("\n");
 					phi0.write("\n");
@@ -176,7 +159,7 @@ public class Driver {
 			theta.close();
 			trainLL.close();
 			testLL.close();
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
