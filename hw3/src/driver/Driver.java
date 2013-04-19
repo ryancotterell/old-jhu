@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Date;
 
 import data.Document;
 import data.DocumentCollection;
@@ -41,14 +42,15 @@ public class Driver {
 		StopWatch watch = new StopWatch();
 		watch.start();
 		
+                Date start = new Date();
 		
 		for (int i = 0; i < burnIn; ++i) {
 			sampler.runIteration(true);
 			double trainLikelihood = sampler.computeLikelihood(true);
 			double testLikelihood = sampler.computeLikelihood(false);
-			if (i % 50 == 0) {
+			/*if (i % 50 == 0) {
 				System.out.printf("iter: %d \t\t train: %f \t\t test: %f\n", i, trainLikelihood, testLikelihood);
-			}
+			}*/
 		}
 		
 		double[] trainLLs = new double[iterations - burnIn];
@@ -59,12 +61,19 @@ public class Driver {
 			double testLikelihood = sampler.computeLikelihood(false);
 			trainLLs[i] = trainLikelihood;
 			testLLs[i] = testLikelihood;
-			System.out.printf("iter: %d \t\t train: %f \t\t test: %f\n", i, trainLikelihood, testLikelihood);
+                        Date current = new Date();
+                        long duration = current.getTime() - start.getTime();
+                        //System.out.printf("%d\t%f\n", duration, trainLikelihood);
+			//System.out.printf("iter: %d \t\t train: %f \t\t test: %f\n", i, trainLikelihood, testLikelihood);
+			//System.out.printf("%f\t\t%f\n", trainLikelihood, testLikelihood);
 		}
 		watch.stop();
-		System.out.println("Duration: " + watch.getTime()/1000.0);
+		//System.out.println("Duration: " + watch.getTime()/1000.0);
+                
+                double likelihood = sampler.computeLikelihoodAverageParams();
+                System.out.printf("%f\t%f\n", lambda, likelihood);
 		
-		writeOutput(outputFile, trainLLs, testLLs, sampler);
+		//writeOutput(outputFile, trainLLs, testLLs, sampler);
 		
 		
 		// load data

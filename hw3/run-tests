@@ -1,0 +1,12 @@
+#./collapsed-sampler data/input-train.txt data/input-test.txt q4/output 10 0.5 0.1 0.01 1100 1000 > q4/10.txt
+#./collapsed-sampler data/input-train.txt data/input-test.txt q4/output 20 0.5 0.1 0.01 1100 1000 > q4/20.txt
+#./collapsed-sampler data/input-train.txt data/input-test.txt q4/output 30 0.5 0.1 0.01 1100 1000 > q4/30.txt
+#./collapsed-sampler data/input-train.txt data/input-test.txt q4/output 40 0.5 0.1 0.01 1100 1000 > q4/40.txt
+#./collapsed-sampler data/input-train.txt data/input-test.txt q4/output 50 0.5 0.1 0.01 1100 1000 > q4/50.txt
+#echo finished q4
+./collapsed-sampler data/input-train.txt data/input-test.txt q5/output 25 0.0 0.1 0.01 1100 1000 > q5/00.txt
+./collapsed-sampler data/input-train.txt data/input-test.txt q5/output 25 0.25 0.1 0.01 1100 1000 > q5/25.txt
+./collapsed-sampler data/input-train.txt data/input-test.txt q5/output 25 0.5 0.1 0.01 1100 1000 > q5/50.txt
+./collapsed-sampler data/input-train.txt data/input-test.txt q5/output 25 0.75 0.1 0.01 1100 1000 > q5/75.txt
+./collapsed-sampler data/input-train.txt data/input-test.txt q5/output 25 1.0 0.1 0.01 1100 1000 > q5/100.txt
+echo finished q5

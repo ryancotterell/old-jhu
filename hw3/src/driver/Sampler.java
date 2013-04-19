@@ -444,6 +444,30 @@ public abstract class Sampler {
 		return likelihood;
 	}
 
+
+	public double computeLikelihoodAverageParams() {
+		double[][] theta = getAverageTestThetas();
+                double[][] phikw = getAveragePhi_kw();
+                double[][][] phickw = getAveragePhi_ckw();
+		DocumentCollection currentDocuments = testDocuments;
+		
+		double likelihood = 0.0;
+		for (int d = 0; d < currentDocuments.size(); ++d) {
+			Document currentDoc = currentDocuments.getDocument(d);
+			for (int i = 0; i < currentDoc.size(); ++i) {
+				double logSum = 0;
+				for (int k = 0; k < numTopics; ++k) {
+					int vocabIndex = Document.vocabulary.get(currentDoc.getWord(i));
+					logSum += theta[d][k]*(
+							(1-lambda)*phikw[k][vocabIndex]
+							+ lambda*phickw[currentDoc.getCorpus()][k][vocabIndex] );
+				}
+				likelihood += Math.log(logSum);
+			}
+		}
+		return likelihood;
+	}
+
 	/**
 	 * Normalizes a likelihood based on the number of tokens in the dataset the
 	 * likelihood was computed for.
