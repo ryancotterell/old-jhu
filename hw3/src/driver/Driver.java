@@ -41,30 +41,32 @@ public class Driver {
 					trainingDocs, testDocs);
 		}
 
-		double[] trainLLs = new double[iterations];
-		double[] testLLs = new double[iterations];
+		//double[] trainLLs = new double[iterations];
+		//double[] testLLs = new double[iterations];
 		for (int i = 0; i < burnIn; ++i) {
 			sampler.runIteration(true);
 			double trainLikelihood = sampler.computeLikelihood(true);
 			double testLikelihood = sampler.computeLikelihood(false);
-			trainLLs[i] = trainLikelihood;
-			testLLs[i] = testLikelihood;
+			//trainLLs[i] = trainLikelihood;
+			//testLLs[i] = testLikelihood;
 			if (i % 50 == 0) {
 				System.out.printf("%d\t\t%f %f\n", i, trainLikelihood, testLikelihood);
 			}
 		}
 
-		//double[] trainLLs = new double[iterations - burnIn];
-		//double[] testLLs = new double[iterations - burnIn];
+		double[] trainLLs = new double[iterations - burnIn];
+		double[] testLLs = new double[iterations - burnIn];
 		for (int i = 0; i < iterations - burnIn; ++i) {
 			sampler.runIteration(false);
 			double trainLikelihood = sampler.computeLikelihood(true);
 			double testLikelihood = sampler.computeLikelihood(false);
-			trainLLs[i + burnIn] = trainLikelihood;
-			testLLs[i + burnIn] = testLikelihood;
-			if (i % 50 == 0) {
-				System.out.printf("%d\t\t%f %f\n", i + burnIn, trainLikelihood, testLikelihood);
-			}
+			//trainLLs[i + burnIn] = trainLikelihood;
+			//testLLs[i + burnIn] = testLikelihood;
+			trainLLs[i] = trainLikelihood;
+			testLLs[i] = testLikelihood;
+//			if (i % 50 == 0) {
+//				System.out.printf("%d\t\t%f %f\n", i + burnIn, trainLikelihood, testLikelihood);
+//			}
 			
 		}
 
