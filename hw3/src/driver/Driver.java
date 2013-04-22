@@ -57,6 +57,8 @@ public class Driver {
 			sampler.runIteration(false);
 			double trainLikelihood = sampler.computeLikelihood(true);
 			double testLikelihood = sampler.computeLikelihood(false);
+			trainLLs[i + burnIn] = trainLikelihood;
+			testLLs[i + burnIn] = testLikelihood;
 			
 		}
 
