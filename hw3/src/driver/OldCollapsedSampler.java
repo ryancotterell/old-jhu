@@ -95,7 +95,7 @@ public class OldCollapsedSampler
 //				{
 //					String word = document.getWord(i);
 //					// update the counts to exclude the assignments of the current token
-//					int k = localZ[i];
+//					
 //					
 //					int w = Document.vocabulary.get(word);
 //					
@@ -109,6 +109,8 @@ public class OldCollapsedSampler
 //						n_ck[c][k] -= 1;
 //					}
 //						
+//					int k = localZ[i];
+	
 //					// randomly sample a new value for z_d,i
 //					localZ[i] = sampleZ(d,i,w,c,n_d);
 //					localX[i] = sampleX(w,c,k);

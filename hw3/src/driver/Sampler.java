@@ -250,6 +250,19 @@ public abstract class Sampler {
 				n_ckw[c][k][w] -= 1;
 			}
 			
+//			// update the counts to exclude the assignments of the current token
+//			int k = localZ[i];
+//			
+//			// randomly sample a new value for z_d,i
+//			localZ[i] = sampleZ(d,i,w,c,n_d);
+//			localX[i] = sampleX(w,c,k);
+//
+//			// update the counts to include the newly sampled assignments of the current token
+//			k = localZ[i];
+//			
+			
+			
+			
 			trainingSample(doc, docNum, i, c, currentDocZs, currentDocXs);
 			k = currentDocZs[i];
 			n_dk_train[docNum][k] += 1;
@@ -274,7 +287,6 @@ public abstract class Sampler {
 		for (int i = 0; i < docSize; ++i) {
 			String word = doc.getWord(i);
 			int k = currentDocZs[i];
-			int w = Document.vocabulary.get(word);
 			
 			//update the counts to exclude the assignments of the current token
 			n_dk_test[docNum][k] -= 1;

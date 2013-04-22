@@ -49,6 +49,9 @@ public class Driver {
 			double testLikelihood = sampler.computeLikelihood(false);
 			trainLLs[i] = trainLikelihood;
 			testLLs[i] = testLikelihood;
+			if (i % 50 == 0) {
+				System.out.printf("%d\t\t%f %f\n", i, trainLikelihood, testLikelihood);
+			}
 		}
 
 		//double[] trainLLs = new double[iterations - burnIn];
@@ -59,6 +62,9 @@ public class Driver {
 			double testLikelihood = sampler.computeLikelihood(false);
 			trainLLs[i + burnIn] = trainLikelihood;
 			testLLs[i + burnIn] = testLikelihood;
+			if (i % 50 == 0) {
+				System.out.printf("%d\t\t%f %f\n", i + burnIn, trainLikelihood, testLikelihood);
+			}
 			
 		}
 
