@@ -55,10 +55,29 @@ def plot_block_v_collapse():
 
 def plot_question1():
   for i in range(1, 4):
-    fname = 'question1/output' + str(i) + '-25-0.5-0.1-train
+    pylab.clf()
+    trainfname = 'question1/output' + str(i) + '-25-0.5-0.1-trainll.txt'
+    testfname = 'question1/output' + str(i) + '-25-0.5-0.1-testll.txt'
+    trainlls = np.loadtxt(trainfname, unpack=True)
+    testlls = np.loadtxt(testfname, unpack=True)
+    iters = np.arange(1, len(trainlls) + 1, 1)
+    norm_testlls = testlls / 30372.0
+    norm_trainlls = trainlls / 120114.0
+    pylab.plot(iters, norm_trainlls, c='r', label='Training Likelihood')
+    pylab.plot(iters, norm_testlls, c='b', label='Test Likelihood')
+    pylab.xlabel('Iteration Number')
+    pylab.ylabel('Training Log Likelihood')
+    pylab.legend(loc=4)
+    pylab.title('Likelihood vs Iteration Number')
+    pylab.subplots_adjust(left=0.15)
+    outname = 'train_test_' + str(i) + '.png'
+    pylab.savefig(outname)
+
+    
 
 if __name__=='__main__':
   #plot_lambdas()
   #plot_topics()
   #plot_runtimes()
-  plot_block_v_collapse()
+  #plot_block_v_collapse()
+  plot_question1()
