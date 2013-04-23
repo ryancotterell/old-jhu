@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
+import java.util.*;
 
 import data.Document;
 import data.DocumentCollection;
@@ -39,15 +40,15 @@ public class Driver {
 					trainingDocs, testDocs);
 		}
 
-        //Date start = new Date();
-		//double[] trainLLs = new double[iterations];
-		//double[] testLLs = new double[iterations];
+                //Date start = new Date();
+		double[] trainLLs = new double[iterations];
+		double[] testLLs = new double[iterations];
 		for (int i = 0; i < burnIn; ++i) {
 			sampler.runIteration(true);
 			double trainLikelihood = sampler.computeLikelihood(true);
 			double testLikelihood = sampler.computeLikelihood(false);
-			//trainLLs[i] = trainLikelihood;
-			//testLLs[i] = testLikelihood;
+			trainLLs[i] = trainLikelihood;
+			testLLs[i] = testLikelihood;
 			//if (i % 50 == 0) {
 			//	System.out.printf("%d\t\t%f %f\n", i, trainLikelihood, testLikelihood);
 			//}
@@ -56,27 +57,27 @@ public class Driver {
                         //System.out.printf("%d\t%f\n", duration, trainLikelihood);
 		}
 
-		double[] trainLLs = new double[iterations - burnIn];
-		double[] testLLs = new double[iterations - burnIn];
+		//double[] trainLLs = new double[iterations - burnIn];
+		//double[] testLLs = new double[iterations - burnIn];
 		for (int i = 0; i < iterations - burnIn; ++i) {
 			sampler.runIteration(false);
 			double trainLikelihood = sampler.computeLikelihood(true);
 			double testLikelihood = sampler.computeLikelihood(false);
-			//trainLLs[i + burnIn] = trainLikelihood;
-			//testLLs[i + burnIn] = testLikelihood;
-			trainLLs[i] = trainLikelihood;
-			testLLs[i] = testLikelihood;
+			trainLLs[i + burnIn] = trainLikelihood;
+			testLLs[i + burnIn] = testLikelihood;
+			//trainLLs[i] = trainLikelihood;
+			//testLLs[i] = testLikelihood;
 //			//if (i % 50 == 0) {
 //			//	System.out.printf("%d\t\t%f %f\n", i + burnIn, trainLikelihood, testLikelihood);
 //			//}
-            //Date current = new Date();
-            //long duration = current.getTime() - start.getTime();
-            //System.out.printf("%d\t%f\n", duration, trainLikelihood);
-			
+                        //Date current = new Date();
+                        //long duration = current.getTime() - start.getTime();
+                        //System.out.printf("%d\t%f\n", duration, trainLikelihood);
+			//
 		}
 
 		//double likelihood = sampler.computeLikelihoodAverageParams();
-        //System.out.printf("%f\t%f\n", lambda, likelihood);
+                //System.out.printf("%f\t%f\n", lambda, likelihood);
 		//System.out.printf("%d\t%f\n", numTopics, likelihood);
 
 		writeOutput(outputFile, trainLLs, testLLs, sampler);
