@@ -57,7 +57,7 @@ public class CollapsedSampler extends Sampler {
 		//xProbabilities[1] = lambda * (( n_ckw[corpusNum][k][w] ) / (n_ck[corpusNum][k] + V * beta));
 
 		xProbabilities[0] = (1 - lambda) * ((n_kw[old_k][w] + beta) / (n_k[old_k] + V * beta));
-		xProbabilities[1] = lambda * (( n_ckw[corpusNum][old_k][w] ) / (n_ck[corpusNum][old_k] + V * beta));
+		xProbabilities[1] = lambda * (( n_ckw[corpusNum][old_k][w] + beta) / (n_ck[corpusNum][old_k] + V * beta));
 
 		
 		Multinomial xMult = new Multinomial(xProbabilities);
@@ -90,16 +90,17 @@ public class CollapsedSampler extends Sampler {
 
 		}
 		Multinomial mult = new Multinomial(probabilities);
+		int k = currentDocZs[wordNum];
 		currentDocZs[wordNum] = mult.sample();
 
 		// Now sample x using new value for k
 		double[] xProbabilities = new double[2];
-		int k = currentDocZs[wordNum];
+		//int k = currentDocZs[wordNum];
 
 		xProbabilities[0] = (1 - lambda)
 				* ((n_kw[k][w] + beta) / (n_k[k] + V * beta));
 		xProbabilities[1] = lambda
-				* ((n_ckw[corpusNum][k][w]) / (n_ck[corpusNum][k] + V * beta));
+				* ((n_ckw[corpusNum][k][w] + beta) / (n_ck[corpusNum][k] + V * beta));
 
 		Multinomial xMult = new Multinomial(xProbabilities);
 		currentDocXs[wordNum] = xMult.sample();

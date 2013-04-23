@@ -7,7 +7,7 @@ import pylab
 
 def main(infile, outfile):
     lls = np.loadtxt(infile, unpack=True)
-    lls = lls[:900]
+    #lls = lls[:900]
     xs = np.arange(1, len(lls) + 1, 1)
 
     pylab.plot(xs, lls, c='b')
