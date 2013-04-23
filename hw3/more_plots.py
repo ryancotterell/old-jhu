@@ -74,10 +74,26 @@ def plot_question1():
     pylab.savefig(outname)
 
     
+def average_runtimes():
+  br, blls = np.loadtxt('question3/blocked-runtimes', unpack=True)
+  cr, clls = np.loadtxt('question3/collapsed-runtimes', unpack=True)
+  br_per_iter = np.zeros(len(br))
+  cr_per_iter = np.zeros(len(br))
+  br_per_iter[0] = br[0]
+  cr_per_iter[0] = cr[0]
+  for i in range(1, len(br)):
+    br_per_iter[i] = br[i] - br[i-1]
+    cr_per_iter[i] = cr[i] - cr[i-1]
+  print 'blocked', np.mean(br_per_iter)
+  print 'collapsed', np.mean(cr_per_iter)
+    
+  
+
 
 if __name__=='__main__':
   #plot_lambdas()
   #plot_topics()
   #plot_runtimes()
   #plot_block_v_collapse()
-  plot_question1()
+  #plot_question1()
+  average_runtimes()
