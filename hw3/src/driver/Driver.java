@@ -4,13 +4,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
+import java.io.PrintWriter;
 import java.util.Scanner;
-import java.util.Date;
 
 import data.Document;
 import data.DocumentCollection;
-import util.StopWatch;
 
 public class Driver {
 
@@ -122,12 +120,13 @@ public class Driver {
 			double[] testlls, Sampler s) {
 		filePrefix += "-" + numTopics + "-" + lambda + "-" + alpha;
 		try {
-			FileWriter phi = new FileWriter(filePrefix + "-phi.txt");
-			FileWriter phi0 = new FileWriter(filePrefix + "-phi0.txt");
-			FileWriter phi1 = new FileWriter(filePrefix + "-phi1.txt");
-			FileWriter theta = new FileWriter(filePrefix + "-theta.txt");
-			FileWriter trainLL = new FileWriter(filePrefix + "-trainll.txt");
-			FileWriter testLL = new FileWriter(filePrefix + "-testll.txt");
+			
+			PrintWriter phi     = new PrintWriter(new FileWriter(filePrefix + "-phi.txt"));
+			PrintWriter phi0    = new PrintWriter(new FileWriter(filePrefix + "-phi0.txt"));
+			PrintWriter phi1    = new PrintWriter(new FileWriter(filePrefix + "-phi1.txt"));
+			PrintWriter theta   = new PrintWriter(new FileWriter(filePrefix + "-theta.txt"));
+			PrintWriter trainLL = new PrintWriter(new FileWriter(filePrefix + "-trainll.txt"));
+			PrintWriter testLL  = new PrintWriter(new FileWriter(filePrefix + "-testll.txt"));
 			double[][] testThetas = s.getAverageTestThetas();
 			double[][] trainThetas = s.getAverageTrainThetas();
 			double[][] phiKW = s.getAveragePhi_kw();
@@ -135,17 +134,17 @@ public class Driver {
 
 			// write likelihoods
 			for (int i = 0; i < trainlls.length; ++i) {
-				trainLL.write(trainlls[i] + "\n");
-				testLL.write(testlls[i] + "\n");
+				trainLL.printf("%.13e\n", trainlls[i]);
+				testLL.printf("%.13e\n", testlls[i]);
 			}
 
 			int vocabSize = Document.vocabulary.size();
 
 			// write thetas
 			for (int d = 0; d < trainThetas.length; ++d) {
-				theta.write("" + trainThetas[d][0]);
+				theta.printf("%.13e", trainThetas[d][0]);
 				for (int k = 1; k < trainThetas[0].length; ++k) {
-					theta.write(" " + trainThetas[d][k]);
+					theta.printf(" %.13e", trainThetas[d][k]);
 				}
 			}
 
@@ -153,20 +152,18 @@ public class Driver {
 			int counter = 1;
 			int size = Document.vocabulary.keySet().size();
 			for (String word : Document.vocabulary.keySet()) {
-				phi.write(word);
-				phi0.write(word);
-				phi1.write(word);
+				phi.printf(word);
+				phi0.printf(word);
+				phi1.printf(word);
 				for (int k = 0; k < numTopics; ++k) {
-					phi.write(" " + phiKW[k][Document.vocabulary.get(word)]);
-					phi0.write(" "
-							+ phiCKW[0][k][Document.vocabulary.get(word)]);
-					phi1.write(" "
-							+ phiCKW[1][k][Document.vocabulary.get(word)]);
+					phi.printf(" %.13e", phiKW[k][Document.vocabulary.get(word)]);
+					phi0.printf(" %.13e", phiCKW[0][k][Document.vocabulary.get(word)]);
+					phi1.printf(" %.13e", phiCKW[1][k][Document.vocabulary.get(word)]);
 
 				}
 
 				if (size != counter) {
-					phi.write("\n");
+                    phi.write("\n");
 					phi0.write("\n");
 					phi1.write("\n");
 				}
