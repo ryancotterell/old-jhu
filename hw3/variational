@@ -1,1 +1,1 @@
-java -cp bin driver/Variational $*
+java -cp bin:lib/commons-math3-3.2/commons-math3-3.2.jar variational/MCLDAVariational $*
