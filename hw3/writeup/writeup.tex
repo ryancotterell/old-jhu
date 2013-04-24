@@ -152,7 +152,7 @@ Most of the heavy lifting for this question was done in the appendix so there is
 			will be sampled will become a point mass.
 			In that extreme case, we should get
 			every topic to be equally likely in each document, which will make it
-			harder to associate individual topics with each document.
+			harder to associate individual topics with each document. In practice, we found this made the topics less well defined. Each document had more topics associated with it so a more diverse set of a words associated with it so they were less focused. $\alpha$ smoothes the topics per document distribution since it makes it more uniform (smoothing means making more uniform, effectively). Similarly, $\beta$ smooths the words per topic distribution. If $\beta$ goes to infinity each $p(w|k)$ is uniform, meaning that each word is equally likely under each topic. As we raise $\beta$ we see a similar affect to raising $\alpha$, the topics are less well defined because each word is smoothed to be more likely with each topic.
 		\end{enumerate}
 	\end{enumerate}
 	
