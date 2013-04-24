@@ -105,6 +105,7 @@ public class Variational
 			lls.add(likelihood);
 			mStep();
 		}
+		
 		writeOutput(lls);
 	}
 
@@ -177,7 +178,7 @@ public class Variational
 			ll += likelihood(d);
 			
 		}
-		
+		System.out.println(ll);
 		return ll;
 		
 	}
@@ -383,17 +384,15 @@ public class Variational
 	
 	private static void readParameters(String[] args)
 	{
-		if (args.length == 9)
-		{
-			Variational.trainingFile = args[0];
-			Variational.testFile = args[1];
-			Variational.outputFile = args[2];
-			Variational.K = Integer.parseInt(args[3]);
-			Variational.lambda = Double.parseDouble(args[4]);
-			Variational.alpha = Double.parseDouble(args[5]);
-			Variational.beta = Double.parseDouble(args[6]);
-			
-		}
+	   
+	    Variational.trainingFile = args[0];
+	    Variational.testFile = args[1];
+	    Variational.outputFile = args[2];
+	    Variational.K = Integer.parseInt(args[3]);
+	    Variational.lambda = Double.parseDouble(args[4]);
+	    Variational.alpha = Double.parseDouble(args[5]);
+	    Variational.beta = Double.parseDouble(args[6]);
+	    
 	}
 
 
