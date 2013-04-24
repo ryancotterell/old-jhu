@@ -53,6 +53,17 @@ def plot_block_v_collapse():
   pylab.subplots_adjust(left=0.15)
   pylab.savefig('block_v_collapse_plot.png')
 
+def plot_var1():
+  blls = np.loadtxt('variational-output/variational-output-25-0.1-trainll.txt', unpack=True)
+  br = np.arange(1, len(blls) + 1, 1)
+  pylab.clf()
+  pylab.plot(br, blls, c='b')
+  pylab.xlabel('Iteration Number')
+  pylab.ylabel('Training Log Likelihood')
+  pylab.title('Likelihood vs Iteration Number For Variational Inference')
+  pylab.subplots_adjust(left=0.15)
+  pylab.savefig('q6.3.1.png')
+
 def plot_question1():
   for i in range(1, 4):
     pylab.clf()
@@ -96,4 +107,5 @@ if __name__=='__main__':
   #plot_runtimes()
   #plot_block_v_collapse()
   #plot_question1()
-  average_runtimes()
+  #average_runtimes()
+  plot_var1()
