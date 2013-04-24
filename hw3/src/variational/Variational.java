@@ -243,7 +243,17 @@ public class Variational
 			
 			PrintWriter phi     = new PrintWriter(new FileWriter(filePrefix + "-phi.txt"));
 			PrintWriter trainLL = new PrintWriter(new FileWriter(filePrefix + "-trainll.txt"));
+			PrintWriter theta   = new PrintWriter(new FileWriter(filePrefix + "-theta.txt"));
 			double[][] phiKW = phi_kv;
+			double[][] trainThetas = gamma_dk;
+			
+			// write thetas
+			for (int d = 0; d < trainThetas.length; ++d) {
+				theta.printf("%.13e", trainThetas[d][0]);
+				for (int k = 1; k < trainThetas[0].length; ++k) {
+					theta.printf(" %.13e", trainThetas[d][k]);
+				}
+			}
 
 			// write likelihoods
 			for (int i = 0; i < trainlls.size(); ++i) {
@@ -269,6 +279,7 @@ public class Variational
 			}
 			phi.close();
 			trainLL.close();
+			theta.close();
 			
 		} catch (IOException e) {
 			e.printStackTrace();

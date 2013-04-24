@@ -154,12 +154,23 @@ public class MCLDAVariational
 			PrintWriter phi0    = new PrintWriter(new FileWriter(filePrefix + "-phi0.txt"));
 			PrintWriter phi1    = new PrintWriter(new FileWriter(filePrefix + "-phi1.txt"));
 			PrintWriter trainLL = new PrintWriter(new FileWriter(filePrefix + "-trainll.txt"));
+			PrintWriter theta   = new PrintWriter(new FileWriter(filePrefix + "-theta.txt"));
 			double[][] phiKW = phi_global_kv;
 			double[][][] phiCKW = phi_local_ckv;
 
 			// write likelihoods
 			for (int i = 0; i < trainlls.size(); ++i) {
 				trainLL.printf("%.13e\n", trainlls.get(i));
+			}
+			
+			double[][] trainThetas = gamma_dk;
+
+			// write thetas
+			for (int d = 0; d < trainThetas.length; ++d) {
+				theta.printf("%.13e", trainThetas[d][0]);
+				for (int k = 1; k < trainThetas[0].length; ++k) {
+					theta.printf(" %.13e", trainThetas[d][k]);
+				}
 			}
 
 			int vocabSize = Document.vocabulary.size();
@@ -189,6 +200,7 @@ public class MCLDAVariational
 			phi0.close();
 			phi1.close();
 			trainLL.close();
+			theta.close();
 			
 		} catch (IOException e) {
 			e.printStackTrace();
