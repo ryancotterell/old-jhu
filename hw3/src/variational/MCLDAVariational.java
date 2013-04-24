@@ -37,7 +37,7 @@ public class MCLDAVariational
 	
 	private static double alpha = 0.1;
 	private static double beta = Math.log(0.01);
-	private static double[] lambda = {0.5, 0.5};
+	private static double[] lambda;// = {0.5, 0.5};
 	
 	private static boolean converged;
 	private static int iterations;
@@ -56,6 +56,7 @@ public class MCLDAVariational
 	
 	public static void main(String[] args)
 	{
+		lambda = new double[2];
 		MCLDAVariational.readParameters(args);
 		
 		trainingDocuments = DataUtils.loadData(MCLDAVariational.trainingFile);
@@ -147,7 +148,7 @@ public class MCLDAVariational
 	 * @param filePrefix
 	 */
 	private static void writeOutput(ArrayList<Double> trainlls) {
-		String filePrefix = outputFile + "-" + K + "-" + alpha;
+		String filePrefix = outputFile + "-" + K + "-" + lambda[G] + "-" + alpha;
 		try {
 			
 			PrintWriter phi     = new PrintWriter(new FileWriter(filePrefix + "-phi.txt"));
@@ -503,7 +504,8 @@ public class MCLDAVariational
 			MCLDAVariational.testFile = args[1];
 			MCLDAVariational.outputFile = args[2];
 			MCLDAVariational.K = Integer.parseInt(args[3]);
-			//MCLDAVariational.lambda = Double.parseDouble(args[4]);
+			MCLDAVariational.lambda[G] = Double.parseDouble(args[4]);
+			MCLDAVariational.lambda[L] = 1.0 - MCLDAVariational.lambda[G];
 			MCLDAVariational.alpha = Double.parseDouble(args[5]);
 			MCLDAVariational.beta = Double.parseDouble(args[6]);
 			
