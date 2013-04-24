@@ -132,12 +132,27 @@ Most of the heavy lifting for this question was done in the appendix so there is
 			clearly contains NLP related topics with topics related to parsing,
 			SMT, IR, QA, and Semantics.
 			
+			\item 
+			
+			When the value for $\lambda$ is close to 0, this means that all of
+			the topics come from the global corpus. The global topics are rather
+			diverse as before. You can see topics that come from the NIPS
+			and ACL corpora. These tend to be general machine learning topics.
+			The corpus-specific topics are all the same. This is because none
+			of the words are drawn from the corpus-specific topic, so each  of
+			the words is equally likely. Therefore, all of the topics are the same.
+			
+			Then when $\lambda$ goes to 1, all of the global corpus topics
+			are identical. This follows a similar argument as before. The NIPS
+			and ACL topics are very specific to each group. The NIPS has topics
+			about neural networks and imaging; the ACL topics deal with
+			semantics and other NLP related topics. This is expected.
+			
 			\item As $\alpha$ goes to infinity, the Dirichlet from which every $\theta$ 
 			will be sampled will become a point mass.
 			In that extreme case, we should get
 			every topic to be equally likely in each document, which will make it
 			harder to associate individual topics with each document.
-			\item 
 		\end{enumerate}
 	\end{enumerate}
 	
