@@ -223,8 +223,26 @@ $$
 	\setcounter{subsection}{2}
 	\subsection{Empirical Questions}
 	\begin{enumerate}
-		\item 
-		\item
+		\item Here we have the training likelihood for the 20 iterations
+		that the variational program ran for.
+		\begin{figure}[h]
+			\caption{Question 1}
+			\begin{center}
+				\includegraphics[scale=0.5]{../variationalll}
+			\end{center}
+		\end{figure}
+		
+		\item The top line is the likelihood for the collapsed sampler. The other
+		line is the plot for the variational likelihood. In both cases, we plot the
+		last 20 iterations for an easy comparison. As you can see, the variational
+		likelihood is always much lower than the collapsed sampler, which holds
+		true over multiple executions.
+		\begin{figure}[h]
+			\caption{Question 2}
+			\begin{center}
+				\includegraphics[scale=0.5]{../variational_compare}
+			\end{center}
+		\end{figure}
 		\item
 		\item
 	\end{enumerate}
